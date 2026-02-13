@@ -6,7 +6,7 @@
 <title>My Goop 💖</title>
 <style>
 html, body {
-    overflow-x: hidden; /* Fix horizontal scroll */
+    overflow-x: hidden;
     margin: 0;
     height: 100vh;
     background: linear-gradient(135deg, #ffd6f0, #e6c9ff, #d9b3ff);
@@ -18,7 +18,6 @@ html, body {
     position: relative;
 }
 
-/* Glow overlay */
 #glow-overlay {
     position: fixed;
     top:0; left:0;
@@ -29,7 +28,6 @@ html, body {
     z-index:0;
 }
 
-/* Background floating text */
 #bg-text {
     position: fixed;
     top:50%;
@@ -49,7 +47,6 @@ html, body {
     100% { transform: translate(-50%, -50%) rotate(-10deg); }
 }
 
-/* Container */
 .container { text-align:center; z-index:5; }
 h1 { font-size:3rem; text-shadow:0 0 25px #ffb6c1; }
 h2 { font-size:2rem; text-shadow:0 0 15px #ffb6c1; }
@@ -73,7 +70,6 @@ button {
     100% { transform: scale(1); box-shadow:0 0 20px #ffb6c1; }
 }
 
-/* Pokémon */
 .pokemon {
     position:absolute;
     width:120px;
@@ -82,34 +78,26 @@ button {
     image-rendering: pixelated;
     filter: drop-shadow(0 0 15px rgba(255,192,203,0.7));
 }
-
-/* Floating + side-to-side bob */
 @keyframes float {
-    0% { transform: translate(0, 0); }
-    25% { transform: translate(5px, -10px); }
-    50% { transform: translate(-5px, -20px); }
-    75% { transform: translate(5px, -10px); }
-    100% { transform: translate(0, 0); }
+    0% { transform: translate(0,0); }
+    25% { transform: translate(5px,-10px); }
+    50% { transform: translate(-5px,-20px); }
+    75% { transform: translate(5px,-10px); }
+    100% { transform: translate(0,0); }
 }
 
-/* Heart particles */
 .heart-particle { position:absolute; font-size:20px; animation: heartMove 1s forwards; }
 @keyframes heartMove { 0%{opacity:1;transform:translate(0,0) scale(1);} 100%{opacity:0;transform:translate(calc(50px - 100px*var(--randX)),-80px) scale(1.5);} }
 
-/* Background hearts floating */
 .background-heart { position:absolute; font-size:25px; animation: drift linear infinite; opacity:0.7; filter:drop-shadow(0 0 8px rgba(255,182,193,0.7)); }
 
-/* Flowers */
 .flower { position:absolute; width:30px; opacity:0.7; animation: floatFlower linear infinite; pointer-events:none; }
 
-/* Confetti sparkles */
 .confetti { position:absolute; width:8px; height:8px; background:hsl(0,0%,100%); border-radius:50%; pointer-events:none; animation: confettiFall linear infinite; opacity:0.8; }
 @keyframes confettiFall { 0% { transform: translateY(-10px) rotate(0deg);} 100% { transform: translateY(100vh) rotate(360deg);} }
 
-/* Floating flower animation */
 @keyframes floatFlower { 0%{transform:translateY(0) rotate(0deg);opacity:0.7;}50%{transform:translateY(-100px) rotate(180deg);opacity:1;}100%{transform:translateY(0px) rotate(360deg);opacity:0.7;} }
 
-/* Pokémon sparkle hearts around */
 .poke-heart { position:absolute; font-size:15px; animation: pokeHeart floatPokeHeart linear infinite; pointer-events:none; }
 @keyframes floatPokeHeart { 0% {transform:translate(0,0) scale(0.8); opacity:1;} 50% {transform:translate(5px,-10px) scale(1.2); opacity:0.8;} 100% {transform:translate(0,0) scale(1); opacity:1;} }
 
@@ -122,21 +110,7 @@ button {
 <div id="glow-overlay"></div>
 <div id="flower-container"></div>
 <div id="heart-container"></div>
-<div id="twinkle-container"></div>
 <div id="bg-text">Stephanie Poetri ❤️ Love You 3000</div>
-
-<!-- Pokémon -->
-<img class="pokemon snom" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png" style="top:5%; left:5%; animation-delay:0s;">
-<img class="pokemon snom" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png" style="top:20%; right:10%; animation-delay:1s;">
-
-<img id="bellibolt1" class="pokemon bellibolt" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png" style="top:10%; left:20%; animation-delay:0.5s;">
-<img id="bellibolt2" class="pokemon bellibolt" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png" style="top:10%; left:60%; animation-delay:1s;">
-<img id="bellibolt3" class="pokemon bellibolt" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png" style="bottom:15%; left:25%; animation-delay:2s;">
-<img id="bellibolt4" class="pokemon bellibolt" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png" style="bottom:15%; left:65%; animation-delay:3s;">
-
-<img class="pokemon eevee" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png" style="top:40%; left:10%; animation-delay:0.3s;">
-<img class="pokemon togepi" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/175.png" style="bottom:20%; right:15%; animation-delay:0.7s;">
-<img class="pokemon jigglypuff" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png" style="top:30%; right:30%; animation-delay:1s;">
 
 <div class="container">
     <h2>My Goop 💜</h2>
@@ -148,19 +122,50 @@ button {
 </div>
 
 <canvas id="canvas"></canvas>
-<audio id="victorySound" src="https://www.myinstants.com/media/sounds/pokemon-level-up-sound-effect.mp3"></audio>
+<audio id="victorySound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
 
 <script>
-const noBtn=document.getElementById("noBtn");
-const yesBtn=document.getElementById("yesBtn");
 const canvas=document.getElementById("canvas");
 const ctx=canvas.getContext("2d");
 canvas.width=window.innerWidth; canvas.height=window.innerHeight;
-const snoms=document.querySelectorAll(".snom");
-const bellibolts=document.querySelectorAll(".bellibolt");
+
+const yesBtn=document.getElementById("yesBtn");
+const noBtn=document.getElementById("noBtn");
 const victorySound=document.getElementById("victorySound");
 
-/* NO button chasing */
+/* Pokémon dynamic placement to stay in viewport */
+const pokeData=[
+    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png"}, // snom
+    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png"},
+    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png"}, // bellibolt
+    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png"},
+    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png"},
+    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png"},
+    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png"}, // eevee
+    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/175.png"}, // togepi
+    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png"} // jigglypuff
+];
+
+pokeData.forEach(p=>{
+    const img=document.createElement("img");
+    img.src=p.src;
+    img.className="pokemon";
+    img.style.top = (5 + Math.random()*85) + "vh";
+    img.style.left = (5 + Math.random()*85) + "vw";
+    document.body.appendChild(img);
+    // swirling hearts
+    setInterval(()=>{
+        const h=document.createElement("div");
+        h.className="poke-heart"; h.innerText="💖";
+        const rect=img.getBoundingClientRect();
+        h.style.left=(rect.left + Math.random()*50)+"px";
+        h.style.top=(rect.top + Math.random()*50)+"px";
+        document.body.appendChild(h);
+        setTimeout(()=>h.remove(),2000);
+    }, 800);
+});
+
+/* NO button chase */
 let mouseX=0, mouseY=0;
 let noX=window.innerWidth/2, noY=window.innerHeight/2;
 const speed=6;
@@ -170,10 +175,8 @@ function chaseNoButton(){
     const dist=Math.sqrt(dx*dx+dy*dy);
     if(dist<150){
         noX+=(dx/dist)*speed; noY+=(dy/dist)*speed;
-        const maxX=window.innerWidth-noBtn.offsetWidth-10;
-        const maxY=window.innerHeight-noBtn.offsetHeight-10;
-        noX=Math.max(10, Math.min(maxX,noX));
-        noY=Math.max(10, Math.min(maxY,noY));
+        noX=Math.max(10, Math.min(window.innerWidth-noBtn.offsetWidth-10, noX));
+        noY=Math.max(10, Math.min(window.innerHeight-noBtn.offsetHeight-10, noY));
         noBtn.style.left=noX+"px"; noBtn.style.top=noY+"px";
         noBtn.style.transform=`rotate(${Math.random()*60-30}deg)`;
     }
@@ -182,57 +185,14 @@ function chaseNoButton(){
 chaseNoButton();
 setInterval(()=>{ if(Math.random()<0.1){ noX=Math.random()*(window.innerWidth-noBtn.offsetWidth); noY=Math.random()*(window.innerHeight-noBtn.offsetHeight); } },1000);
 
-/* Pokémon sparkle hearts */
-function addPokeHearts(pokemon){
-    setInterval(()=>{
-        const h=document.createElement("div");
-        h.className="poke-heart";
-        h.innerText="💖";
-        document.body.appendChild(h);
-        const rect=pokemon.getBoundingClientRect();
-        h.style.left=(rect.left+Math.random()*50)+"px";
-        h.style.top=(rect.top+Math.random()*50)+"px";
-        setTimeout(()=>h.remove(),2000);
-    }, 800);
-}
-document.querySelectorAll(".pokemon").forEach(addPokeHearts);
-
-/* Bellibolt sparks */
-bellibolts.forEach(b=>{
-    b.addEventListener("mouseover", ()=>{
-        const sparkCount=window.innerWidth<768?6:12;
-        for(let i=0;i<sparkCount;i++){
-            const spark=document.createElement("div");
-            spark.classList.add("bellibolt-spark");
-            spark.style.left=(b.offsetLeft+60+Math.random()*60)+"px";
-            spark.style.top=(b.offsetTop+60+Math.random()*60)+"px";
-            spark.style.backgroundColor=`hsl(${Math.random()*360},100%,70%)`;
-            document.body.appendChild(spark);
-            setTimeout(()=>spark.remove(),600);
-        }
-    });
-});
-
-/* Snom click hearts */
-snoms.forEach(s=>{
-    s.addEventListener("click", e=>{
-        for(let i=0;i<6;i++){
-            const heart=document.createElement("div");
-            heart.className="heart-particle";
-            heart.style.left=e.pageX+"px"; heart.style.top=e.pageY+"px";
-            heart.style.setProperty('--randX', Math.random());
-            document.body.appendChild(heart);
-            setTimeout(()=>heart.remove(),1000);
-        }
-    });
-});
-
-/* YES button heart explosion */
+/* YES button */
 yesBtn.addEventListener("click", ()=>{
-    victorySound.play();
+    victorySound.currentTime=0;
+    victorySound.play().catch(e=>console.log("Sound blocked until user interaction"));
     explodeHearts(canvas.width/2,canvas.height/2);
 });
 
+/* Heart explosion */
 function explodeHearts(x,y){
     let particles=[];
     const count=window.innerWidth<768?80:150;
@@ -255,9 +215,7 @@ function explodeHearts(x,y){
 }
 
 /* Background hearts */
-const heartContainer=document.getElementById("heart-container");
-const heartCount=window.innerWidth<768?15:30;
-for(let i=0;i<heartCount;i++){
+for(let i=0;i<30;i++){
     const heart=document.createElement("div");
     heart.className="background-heart";
     heart.style.left=Math.random()*window.innerWidth+"px";
@@ -265,10 +223,10 @@ for(let i=0;i<heartCount;i++){
     heart.style.fontSize=(15+Math.random()*20)+"px";
     heart.style.animationDuration=(5+Math.random()*5)+"s";
     heart.innerText="💖";
-    heartContainer.appendChild(heart);
+    document.body.appendChild(heart);
 }
 
-/* Confetti sparkles */
+/* Confetti */
 for(let i=0;i<50;i++){
     const conf=document.createElement("div");
     conf.className="confetti";
@@ -278,23 +236,22 @@ for(let i=0;i<50;i++){
     document.body.appendChild(conf);
 }
 
-/* Background flowers */
-const flowerContainer=document.getElementById("flower-container");
+/* Flowers */
 const flowerImages=["https://i.ibb.co/mC0H1Pr/pastel-flower1.png","https://i.ibb.co/vzB8k9B/pastel-flower2.png","https://i.ibb.co/7Y7C5K7/pastel-flower3.png"];
-const flowerCount=window.innerWidth<768?10:20;
-for(let i=0;i<flowerCount;i++){
+for(let i=0;i<20;i++){
     const flower=document.createElement("img");
     flower.src=flowerImages[Math.floor(Math.random()*flowerImages.length)];
     flower.className="flower";
-    flower.style.left=Math.random()*window.innerWidth+"px";
-    flower.style.top=Math.random()*window.innerHeight+"px";
+    flower.style.left=(5+Math.random()*90)+"vw";
+    flower.style.top=(5+Math.random()*90)+"vh";
     flower.style.width=(20+Math.random()*20)+"px";
     flower.style.animationDuration=(5+Math.random()*5)+"s";
-    flowerContainer.appendChild(flower);
+    document.body.appendChild(flower);
 }
 </script>
 </body>
 </html>
+
 
 
 
