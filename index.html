@@ -17,20 +17,6 @@ html, body {
   position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;
   pointer-events:none;
 }
-#bg-text {
-  position:fixed; top:50%; left:50%;
-  transform:translate(-50%,-50%) rotate(-10deg);
-  font-size:5rem; color:rgba(255,182,193,0.2);
-  pointer-events:none; text-align:center;
-  animation:floatText 8s ease-in-out infinite alternate;
-  white-space: nowrap;
-  z-index:2;
-}
-@keyframes floatText{
-  0%{transform:translate(-50%,-52%) rotate(-10deg);}
-  50%{transform:translate(-50%,-48%) rotate(-8deg);}
-  100%{transform:translate(-50%,-50%) rotate(-10deg);}
-}
 .container{
   text-align:center; z-index:5; position:relative;
 }
@@ -53,7 +39,6 @@ button{
 <body>
 
 <div id="background-layer"></div>
-<div id="bg-text">Stephanie Poetri ❤️ Love You 3000</div>
 
 <div class="container">
   <h2>My Goop 💜</h2>
@@ -64,24 +49,30 @@ button{
   </div>
 </div>
 
+<audio id="audio" src="YOUR_PUBLIC_MP3_URL_HERE.mp3"></audio>
+
 <canvas id="canvas"></canvas>
 
 <script>
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
+const audio = document.getElementById("audio");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// Center NO button initially
-let noX = canvas.width/2 + 100;
-let noY = canvas.height/2 + 60;
+// NO button initial position right next to YES
+let yesRect = yesBtn.getBoundingClientRect();
+let noX = yesRect.right + 20;
+let noY = yesRect.top;
 noBtn.style.left = noX + "px";
 noBtn.style.top = noY + "px";
 
-// NO button movement + wiggle on hover
+// Wiggle variables
 let wiggleAngle = 0;
+
+// NO moves quickly only when mouse is near
 document.addEventListener("mousemove", e=>{
   const mx = e.clientX;
   const my = e.clientY;
@@ -91,14 +82,14 @@ document.addEventListener("mousemove", e=>{
   const radius = 120;
   if(distance < radius){
     const angle = Math.atan2(dy, dx);
-    noX -= Math.cos(angle)*12; // fast movement
+    noX -= Math.cos(angle)*12;
     noY -= Math.sin(angle)*12;
     noX = Math.max(0, Math.min(window.innerWidth - noBtn.offsetWidth, noX));
     noY = Math.max(0, Math.min(window.innerHeight - noBtn.offsetHeight, noY));
     noBtn.style.left = noX + "px";
     noBtn.style.top = noY + "px";
 
-    // Wiggle effect
+    // Wiggle
     wiggleAngle = Math.sin(Date.now()/100)*15;
     noBtn.style.transform = `rotate(${wiggleAngle}deg)`;
   } else {
@@ -106,8 +97,10 @@ document.addEventListener("mousemove", e=>{
   }
 });
 
-// YES button triggers heart fireworks
-yesBtn.addEventListener("click",()=>{
+// YES triggers heart fireworks + audio
+yesBtn.addEventListener("click", ()=>{
+  audio.currentTime = 0;
+  audio.play();
   createHeartFireworks(canvas.width/2, canvas.height/2);
 });
 
@@ -198,5 +191,6 @@ pokeData.forEach(src=>{
 </script>
 </body>
 </html>
+
 
 
