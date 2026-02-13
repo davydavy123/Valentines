@@ -10,7 +10,8 @@ html, body {
   overflow:hidden;
   font-family:'Comic Sans MS', cursive, sans-serif;
   background: linear-gradient(135deg,#ffd6f0,#e6c9ff,#d9b3ff);
-  position: relative;
+  display:flex; justify-content:center; align-items:center;
+  position:relative;
 }
 #background-layer {
   position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;
@@ -19,7 +20,7 @@ html, body {
 #bg-text {
   position:fixed; top:50%; left:50%;
   transform:translate(-50%,-50%) rotate(-10deg);
-  font-size:6rem; color:rgba(255,182,193,0.2);
+  font-size:5rem; color:rgba(255,182,193,0.2);
   pointer-events:none; text-align:center;
   animation:floatText 8s ease-in-out infinite alternate;
   white-space: nowrap;
@@ -44,6 +45,9 @@ button{
 #noBtn{background:#9333ea; position:absolute; z-index:6;}
 .floating{position:absolute; z-index:2; pointer-events:none;}
 .pokemon{width:80px;}
+.buttons-wrapper{
+  position:relative; display:flex; justify-content:center; gap:40px; margin-top:20px;
+}
 </style>
 </head>
 <body>
@@ -54,8 +58,10 @@ button{
 <div class="container">
   <h2>My Goop 💜</h2>
   <h1>Will You Be My Valentine? 💘</h1>
-  <button id="yesBtn">Yes 💖</button>
-  <button id="noBtn">No 😆</button>
+  <div class="buttons-wrapper">
+    <button id="yesBtn">Yes 💖</button>
+    <button id="noBtn">No 😆</button>
+  </div>
 </div>
 
 <canvas id="canvas"></canvas>
@@ -68,9 +74,10 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// NO button starting position
-let noX = window.innerWidth/2 + 120;
-let noY = window.innerHeight/2;
+// NO button starting position relative to wrapper
+let wrapperRect = document.querySelector('.buttons-wrapper').getBoundingClientRect();
+let noX = wrapperRect.left + 200; // initial position
+let noY = wrapperRect.top;
 noBtn.style.left = noX + "px";
 noBtn.style.top = noY + "px";
 
@@ -84,7 +91,7 @@ document.addEventListener("mousemove", e=>{
   const radius = 120;
   if(distance < radius){
     const angle = Math.atan2(dy, dx);
-    noX -= Math.cos(angle)*12; // faster speed
+    noX -= Math.cos(angle)*12; // fast
     noY -= Math.sin(angle)*12;
     noX = Math.max(0, Math.min(window.innerWidth - noBtn.offsetWidth, noX));
     noY = Math.max(0, Math.min(window.innerHeight - noBtn.offsetHeight, noY));
@@ -128,7 +135,7 @@ function createFireworks(x,y){
   animate();
 }
 
-// Function to create floating background elements
+// Floating background elements
 function createFloatingElement(type, content, width, speedX, speedY){
   const el = document.createElement(type);
   el.className = "floating";
@@ -162,7 +169,7 @@ for(let i=0;i<20;i++){
   createFloatingElement("div","🎀",null,(Math.random()-0.5)*0.3,(Math.random()-0.5)*0.3);
 }
 
-// Pokémon
+// Pokémon (Belibolt, Snom, Tandemaus, Mousehauld)
 const pokeData=[
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png", // Belibolt
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png", // Snom
@@ -176,3 +183,4 @@ pokeData.forEach(src=>{
 </script>
 </body>
 </html>
+
