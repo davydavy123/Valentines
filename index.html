@@ -133,27 +133,35 @@ const yesBtn=document.getElementById("yesBtn");
 const noBtn=document.getElementById("noBtn");
 const victorySound=document.getElementById("victorySound");
 
-/* Pokémon dynamic placement to stay in viewport */
-const pokeData=[
-    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png"}, // snom
-    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png"},
-    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png"}, // bellibolt
-    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png"},
-    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png"},
-    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png"},
-    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png"}, // eevee
-    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/175.png"}, // togepi
-    {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png"} // jigglypuff
+/* Helper to place elements fully inside viewport */
+function placeInsideViewport(el, padding=20){
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    const maxX = window.innerWidth - w - padding;
+    const maxY = window.innerHeight - h - padding;
+    el.style.left = Math.random()*maxX + "px";
+    el.style.top = Math.random()*maxY + "px";
+}
+
+/* Pokémon */
+const pokeSrcs=[
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png",
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png",
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png",
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png",
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png",
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png",
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png",
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/175.png",
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png"
 ];
 
-pokeData.forEach(p=>{
+pokeSrcs.forEach(src=>{
     const img=document.createElement("img");
-    img.src=p.src;
-    img.className="pokemon";
-    img.style.top = (5 + Math.random()*85) + "vh";
-    img.style.left = (5 + Math.random()*85) + "vw";
+    img.src=src; img.className="pokemon";
+    img.onload = ()=> placeInsideViewport(img);
     document.body.appendChild(img);
-    // swirling hearts
+    // Swirling hearts around Pokémon
     setInterval(()=>{
         const h=document.createElement("div");
         h.className="poke-heart"; h.innerText="💖";
@@ -168,24 +176,32 @@ pokeData.forEach(p=>{
 /* NO button chase */
 let mouseX=0, mouseY=0;
 let noX=window.innerWidth/2, noY=window.innerHeight/2;
-const speed=6;
+const speed=12; // faster
+const triggerDistance=200; // start earlier
 document.addEventListener("mousemove", e=>{mouseX=e.clientX; mouseY=e.clientY;});
 function chaseNoButton(){
     const dx=noX-mouseX, dy=noY-mouseY;
     const dist=Math.sqrt(dx*dx+dy*dy);
-    if(dist<150){
-        noX+=(dx/dist)*speed; noY+=(dy/dist)*speed;
-        noX=Math.max(10, Math.min(window.innerWidth-noBtn.offsetWidth-10, noX));
-        noY=Math.max(10, Math.min(window.innerHeight-noBtn.offsetHeight-10, noY));
-        noBtn.style.left=noX+"px"; noBtn.style.top=noY+"px";
+    if(dist<triggerDistance){
+        noX += (dx/dist)*speed;
+        noY += (dy/dist)*speed;
+        noX = Math.max(10, Math.min(window.innerWidth-noBtn.offsetWidth-10, noX));
+        noY = Math.max(10, Math.min(window.innerHeight-noBtn.offsetHeight-10, noY));
+        noBtn.style.left=noX+"px";
+        noBtn.style.top=noY+"px";
         noBtn.style.transform=`rotate(${Math.random()*60-30}deg)`;
     }
     requestAnimationFrame(chaseNoButton);
 }
 chaseNoButton();
-setInterval(()=>{ if(Math.random()<0.1){ noX=Math.random()*(window.innerWidth-noBtn.offsetWidth); noY=Math.random()*(window.innerHeight-noBtn.offsetHeight); } },1000);
+setInterval(()=>{ 
+    if(Math.random()<0.1){
+        noX=Math.random()*(window.innerWidth-noBtn.offsetWidth);
+        noY=Math.random()*(window.innerHeight-noBtn.offsetHeight);
+    }
+},1000);
 
-/* YES button */
+/* YES button click */
 yesBtn.addEventListener("click", ()=>{
     victorySound.currentTime=0;
     victorySound.play().catch(e=>console.log("Sound blocked until user interaction"));
@@ -242,17 +258,12 @@ for(let i=0;i<20;i++){
     const flower=document.createElement("img");
     flower.src=flowerImages[Math.floor(Math.random()*flowerImages.length)];
     flower.className="flower";
-    flower.style.left=(5+Math.random()*90)+"vw";
-    flower.style.top=(5+Math.random()*90)+"vh";
-    flower.style.width=(20+Math.random()*20)+"px";
-    flower.style.animationDuration=(5+Math.random()*5)+"s";
+    flower.onload = ()=> placeInsideViewport(flower);
     document.body.appendChild(flower);
 }
 </script>
 </body>
 </html>
-
-
 
 
 
