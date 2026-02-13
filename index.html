@@ -65,20 +65,23 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// Fast bouncing NO button
-let noX = Math.random()*(window.innerWidth-noBtn.offsetWidth);
-let noY = Math.random()*(window.innerHeight-noBtn.offsetHeight);
-let vx = (Math.random()*8+8)*(Math.random()<0.5?1:-1);
-let vy = (Math.random()*8+8)*(Math.random()<0.5?1:-1);
-noBtn.style.left = noX+"px";
-noBtn.style.top = noY+"px";
+// Smooth bouncing NO button
+let noX = 100; // starting X
+let noY = 100; // starting Y
+let vx = 6;    // speed X
+let vy = 4;    // speed Y
 
 function animateNo(){
-  noX += vx; noY += vy;
-  if(noX <= 0 || noX >= window.innerWidth - noBtn.offsetWidth) vx*=-1;
-  if(noY <= 0 || noY >= window.innerHeight - noBtn.offsetHeight) vy*=-1;
-  noBtn.style.left = noX+"px";
-  noBtn.style.top = noY+"px";
+  noX += vx;
+  noY += vy;
+
+  // Bounce off edges
+  if(noX <= 0 || noX >= window.innerWidth - noBtn.offsetWidth) vx *= -1;
+  if(noY <= 0 || noY >= window.innerHeight - noBtn.offsetHeight) vy *= -1;
+
+  noBtn.style.left = noX + "px";
+  noBtn.style.top = noY + "px";
+
   requestAnimationFrame(animateNo);
 }
 animateNo();
@@ -107,7 +110,7 @@ function explodeHearts(x,y){
   animate();
 }
 
-// Example Pokémon, flowers, confetti
+// Sample Pokémon, flowers, confetti
 function placeInsideViewport(el){
   const w=el.offsetWidth||50,h=el.offsetHeight||50;
   el.style.left=Math.random()*(window.innerWidth-w-20)+"px";
@@ -145,6 +148,4 @@ for(let i=0;i<50;i++){
 </script>
 </body>
 </html>
-
-
 
