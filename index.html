@@ -6,7 +6,7 @@
 <title>My Goop 💖</title>
 <style>
 html, body {
-    overflow-x: hidden;
+    overflow: hidden;
     margin: 0;
     height: 100vh;
     background: linear-gradient(135deg, #ffd6f0, #e6c9ff, #d9b3ff);
@@ -18,16 +18,6 @@ html, body {
     position: relative;
 }
 
-#glow-overlay {
-    position: fixed;
-    top:0; left:0;
-    width:100%; height:100%;
-    pointer-events:none;
-    background: radial-gradient(circle at 30% 30%, rgba(255,192,203,0.25), transparent 70%), 
-                radial-gradient(circle at 70% 70%, rgba(200,180,255,0.2), transparent 60%);
-    z-index:0;
-}
-
 #bg-text {
     position: fixed;
     top:50%;
@@ -35,7 +25,6 @@ html, body {
     transform: translate(-50%, -50%) rotate(-10deg);
     font-size:6rem;
     color: rgba(255,182,193,0.2);
-    white-space: nowrap;
     z-index:0;
     pointer-events:none;
     text-align:center;
@@ -60,9 +49,10 @@ button {
     cursor:pointer;
     margin:10px;
     transition:0.3s;
+    position: fixed;
 }
-#yesBtn { background-color:#ff69b4; box-shadow:0 0 25px #ffc0cb; animation: pulse 2s infinite; }
-#noBtn { background-color:#9333ea; position:absolute; }
+#yesBtn { background-color:#ff69b4; box-shadow:0 0 25px #ffc0cb; animation: pulse 2s infinite; top: 50%; left: 40%; transform: translate(-50%, -50%); }
+#noBtn { background-color:#9333ea; top: 50%; left: 60%; transform: translate(-50%, -50%); }
 
 @keyframes pulse {
     0% { transform: scale(1); box-shadow:0 0 20px #ffb6c1; }
@@ -86,30 +76,19 @@ button {
     100% { transform: translate(0,0); }
 }
 
-.heart-particle { position:absolute; font-size:20px; animation: heartMove 1s forwards; }
-@keyframes heartMove { 0%{opacity:1;transform:translate(0,0) scale(1);} 100%{opacity:0;transform:translate(calc(50px - 100px*var(--randX)),-80px) scale(1.5);} }
-
-.background-heart { position:absolute; font-size:25px; animation: drift linear infinite; opacity:0.7; filter:drop-shadow(0 0 8px rgba(255,182,193,0.7)); }
-
-.flower { position:absolute; width:30px; opacity:0.7; animation: floatFlower linear infinite; pointer-events:none; }
-
-.confetti { position:absolute; width:8px; height:8px; background:hsl(0,0%,100%); border-radius:50%; pointer-events:none; animation: confettiFall linear infinite; opacity:0.8; }
-@keyframes confettiFall { 0% { transform: translateY(-10px) rotate(0deg);} 100% { transform: translateY(100vh) rotate(360deg);} }
-
-@keyframes floatFlower { 0%{transform:translateY(0) rotate(0deg);opacity:0.7;}50%{transform:translateY(-100px) rotate(180deg);opacity:1;}100%{transform:translateY(0px) rotate(360deg);opacity:0.7;} }
-
-.poke-heart { position:absolute; font-size:15px; animation: pokeHeart floatPokeHeart linear infinite; pointer-events:none; }
+.poke-heart { position:absolute; font-size:15px; animation: floatPokeHeart 2s infinite; pointer-events:none; }
 @keyframes floatPokeHeart { 0% {transform:translate(0,0) scale(0.8); opacity:1;} 50% {transform:translate(5px,-10px) scale(1.2); opacity:0.8;} 100% {transform:translate(0,0) scale(1); opacity:1;} }
 
-@media (max-width:768px){ h1{font-size:2rem;} h2{font-size:1.5rem;} .pokemon{width:80px;} button{padding:12px 30px;font-size:1rem;} #bg-text{font-size:3rem;} }
+.background-heart, .confetti, .flower { position:absolute; pointer-events:none; }
 
+@media (max-width:768px){
+    h1{font-size:2rem;} h2{font-size:1.5rem;}
+    .pokemon{width:80px;} button{padding:12px 30px;font-size:1rem;} #bg-text{font-size:3rem;}
+}
 </style>
 </head>
 <body>
 
-<div id="glow-overlay"></div>
-<div id="flower-container"></div>
-<div id="heart-container"></div>
 <div id="bg-text">Stephanie Poetri ❤️ Love You 3000</div>
 
 <div class="container">
@@ -122,7 +101,7 @@ button {
 </div>
 
 <canvas id="canvas"></canvas>
-<audio id="victorySound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+<audio id="stephSound" src="YOUR_PUBLIC_MP3_URL_HERE" preload="auto"></audio>
 
 <script>
 const canvas=document.getElementById("canvas");
@@ -131,80 +110,67 @@ canvas.width=window.innerWidth; canvas.height=window.innerHeight;
 
 const yesBtn=document.getElementById("yesBtn");
 const noBtn=document.getElementById("noBtn");
-const victorySound=document.getElementById("victorySound");
+const stephSound=document.getElementById("stephSound");
 
-/* Helper to place elements fully inside viewport */
-function placeInsideViewport(el, padding=20){
-    const w = el.offsetWidth;
-    const h = el.offsetHeight;
-    const maxX = window.innerWidth - w - padding;
-    const maxY = window.innerHeight - h - padding;
-    el.style.left = Math.random()*maxX + "px";
-    el.style.top = Math.random()*maxY + "px";
+/* Helper to place elements inside viewport */
+function placeInsideViewport(el,padding=20){
+    const w=el.offsetWidth, h=el.offsetHeight;
+    el.style.left=Math.random()*(window.innerWidth-w-padding)+"px";
+    el.style.top=Math.random()*(window.innerHeight-h-padding)+"px";
 }
 
 /* Pokémon */
 const pokeSrcs=[
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png",
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png",
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png",
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png",
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png",
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png",
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png",
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/175.png",
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png"
+"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png",
+"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png",
+"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png",
+"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png",
+"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png",
+"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png",
+"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png",
+"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/175.png",
+"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png"
 ];
 
 pokeSrcs.forEach(src=>{
     const img=document.createElement("img");
     img.src=src; img.className="pokemon";
-    img.onload = ()=> placeInsideViewport(img);
+    img.onload=()=>placeInsideViewport(img);
     document.body.appendChild(img);
-    // Swirling hearts around Pokémon
     setInterval(()=>{
-        const h=document.createElement("div");
-        h.className="poke-heart"; h.innerText="💖";
+        const h=document.createElement("div"); h.className="poke-heart"; h.innerText="💖";
         const rect=img.getBoundingClientRect();
         h.style.left=(rect.left + Math.random()*50)+"px";
         h.style.top=(rect.top + Math.random()*50)+"px";
         document.body.appendChild(h);
         setTimeout(()=>h.remove(),2000);
-    }, 800);
+    },800);
 });
 
 /* NO button chase */
 let mouseX=0, mouseY=0;
 let noX=window.innerWidth/2, noY=window.innerHeight/2;
-const speed=12; // faster
-const triggerDistance=200; // start earlier
-document.addEventListener("mousemove", e=>{mouseX=e.clientX; mouseY=e.clientY;});
+document.addEventListener("mousemove", e=>{ mouseX=e.clientX; mouseY=e.clientY; });
+
 function chaseNoButton(){
     const dx=noX-mouseX, dy=noY-mouseY;
-    const dist=Math.sqrt(dx*dx+dy*dy);
-    if(dist<triggerDistance){
-        noX += (dx/dist)*speed;
-        noY += (dy/dist)*speed;
+    const dist=Math.sqrt(dx*dx + dy*dy);
+    if(dist<200){
+        noX += (dx/dist)*12;
+        noY += (dy/dist)*12;
         noX = Math.max(10, Math.min(window.innerWidth-noBtn.offsetWidth-10, noX));
         noY = Math.max(10, Math.min(window.innerHeight-noBtn.offsetHeight-10, noY));
         noBtn.style.left=noX+"px";
         noBtn.style.top=noY+"px";
-        noBtn.style.transform=`rotate(${Math.random()*60-30}deg)`;
     }
     requestAnimationFrame(chaseNoButton);
 }
 chaseNoButton();
-setInterval(()=>{ 
-    if(Math.random()<0.1){
-        noX=Math.random()*(window.innerWidth-noBtn.offsetWidth);
-        noY=Math.random()*(window.innerHeight-noBtn.offsetHeight);
-    }
-},1000);
 
-/* YES button click */
+/* YES button */
 yesBtn.addEventListener("click", ()=>{
-    victorySound.currentTime=0;
-    victorySound.play().catch(e=>console.log("Sound blocked until user interaction"));
+    stephSound.currentTime=0;
+    stephSound.play().catch(e=>console.log("Sound blocked until click"));
     explodeHearts(canvas.width/2,canvas.height/2);
 });
 
@@ -229,41 +195,6 @@ function explodeHearts(x,y){
     }
     animate();
 }
-
-/* Background hearts */
-for(let i=0;i<30;i++){
-    const heart=document.createElement("div");
-    heart.className="background-heart";
-    heart.style.left=Math.random()*window.innerWidth+"px";
-    heart.style.bottom=Math.random()*window.innerHeight+"px";
-    heart.style.fontSize=(15+Math.random()*20)+"px";
-    heart.style.animationDuration=(5+Math.random()*5)+"s";
-    heart.innerText="💖";
-    document.body.appendChild(heart);
-}
-
-/* Confetti */
-for(let i=0;i<50;i++){
-    const conf=document.createElement("div");
-    conf.className="confetti";
-    conf.style.left=Math.random()*window.innerWidth+"px";
-    conf.style.animationDuration=(3+Math.random()*3)+"s";
-    conf.style.backgroundColor=`hsl(${Math.random()*360},80%,80%)`;
-    document.body.appendChild(conf);
-}
-
-/* Flowers */
-const flowerImages=["https://i.ibb.co/mC0H1Pr/pastel-flower1.png","https://i.ibb.co/vzB8k9B/pastel-flower2.png","https://i.ibb.co/7Y7C5K7/pastel-flower3.png"];
-for(let i=0;i<20;i++){
-    const flower=document.createElement("img");
-    flower.src=flowerImages[Math.floor(Math.random()*flowerImages.length)];
-    flower.className="flower";
-    flower.onload = ()=> placeInsideViewport(flower);
-    document.body.appendChild(flower);
-}
 </script>
 </body>
 </html>
-
-
-
