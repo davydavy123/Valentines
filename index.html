@@ -19,13 +19,16 @@ html, body {
   pointer-events:none; text-align:center;
   animation:floatText 8s ease-in-out infinite alternate;
   white-space: nowrap;
+  z-index:1;
 }
 @keyframes floatText{
   0%{transform:translate(-50%,-52%) rotate(-10deg);}
   50%{transform:translate(-50%,-48%) rotate(-8deg);}
   100%{transform:translate(-50%,-50%) rotate(-10deg);}
 }
-.container{text-align:center; z-index:5;}
+.container{
+  text-align:center; z-index:5; position:relative;
+}
 h1{font-size:3rem; text-shadow:0 0 25px #ffb6c1;}
 h2{font-size:2rem; text-shadow:0 0 15px #ffb6c1;}
 button{
@@ -33,10 +36,9 @@ button{
   border-radius:30px; cursor:pointer; margin:10px; transition:0.3s;
 }
 #yesBtn{background:#ff69b4; box-shadow:0 0 25px #ffc0cb;}
-#noBtn{background:#9333ea; position:absolute;}
-.particle, .pokemon, .flower, .confetti{
-  position:absolute; z-index:3; pointer-events:none;
-}
+#noBtn{background:#9333ea; position:absolute; z-index:6;}
+.floating{position:absolute; z-index:2; pointer-events:none;}
+.pokemon{width:80px;}
 </style>
 </head>
 <body>
@@ -61,8 +63,8 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 // NO button starting position
-let noX = window.innerWidth/2 - 50;
-let noY = window.innerHeight/2 + 50;
+let noX = window.innerWidth/2 + 120;
+let noY = window.innerHeight/2;
 noBtn.style.left = noX + "px";
 noBtn.style.top = noY + "px";
 
@@ -111,71 +113,59 @@ function explodeHearts(x,y){
 }
 
 // Floating elements
-function createFloating(element,text,color,size,speedX,speedY){
-  element.innerText = text;
-  element.style.fontSize = size+"px";
-  element.style.color = color;
-  element.style.left = Math.random()*window.innerWidth+"px";
-  element.style.top = Math.random()*window.innerHeight+"px";
-  document.body.appendChild(element);
-
+function createFloating(imgOrDiv, speedX, speedY){
+  let x = Math.random()*(window.innerWidth-50);
+  let y = Math.random()*(window.innerHeight-50);
+  imgOrDiv.style.left = x + "px";
+  imgOrDiv.style.top = y + "px";
+  document.body.appendChild(imgOrDiv);
   function float(){
-    let x = parseFloat(element.style.left);
-    let y = parseFloat(element.style.top);
-    x += speedX;
-    y += speedY;
-    if(x<0 || x>window.innerWidth) speedX*=-1;
-    if(y<0 || y>window.innerHeight) speedY*=-1;
-    element.style.left = x+"px";
-    element.style.top = y+"px";
+    x += speedX; y += speedY;
+    if(x<0 || x>window.innerWidth-50) speedX*=-1;
+    if(y<0 || y>window.innerHeight-50) speedY*=-1;
+    imgOrDiv.style.left = x+"px";
+    imgOrDiv.style.top = y+"px";
     requestAnimationFrame(float);
   }
   float();
 }
 
-// Add flowers
+// Flowers
 for(let i=0;i<15;i++){
-  createFloating(document.createElement("div"),"🌸","#ffb6c1",20+Math.random()*20,(Math.random()-0.5)*0.5,(Math.random()-0.5)*0.5);
+  const f = document.createElement("div");
+  f.className="floating";
+  f.innerText = "🌸";
+  f.style.fontSize = (20+Math.random()*20)+"px";
+  f.style.color = "#ffb6c1";
+  createFloating(f,(Math.random()-0.5)*0.3,(Math.random()-0.5)*0.3);
 }
 
-// Add confetti
+// Confetti
 for(let i=0;i<20;i++){
-  createFloating(document.createElement("div"),"🎀","#ffc0cb",15+Math.random()*10,(Math.random()-0.5)*0.5,(Math.random()-0.5)*0.5);
+  const c = document.createElement("div");
+  c.className="floating";
+  c.innerText = "🎀";
+  c.style.fontSize = (15+Math.random()*10)+"px";
+  createFloating(c,(Math.random()-0.5)*0.3,(Math.random()-0.5)*0.3);
 }
 
-// Add Pokémon including Belibolt, Snom, Tandemaus, Mousehauld
+// Pokémon
 const pokeSrcs=[
-  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png", // Belibolt
-  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png", // Snom
-  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1016.png", // Tandemaus
-  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1017.png"  // Mousehauld
+  {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png", name:"Belibolt"},
+  {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png", name:"Snom"},
+  {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1016.png", name:"Tandemaus"},
+  {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1017.png", name:"Mousehauld"}
 ];
 
-pokeSrcs.forEach(src=>{
+pokeSrcs.forEach(p=>{
   const img = document.createElement("img");
-  img.src = src;
-  img.className = "pokemon";
-  img.style.width = "100px";
-  document.body.appendChild(img);
-  const speedX = (Math.random()-0.5)*0.3;
-  const speedY = (Math.random()-0.5)*0.3;
-  img.style.left = Math.random()*window.innerWidth + "px";
-  img.style.top = Math.random()*window.innerHeight + "px";
-
-  function float(){
-    let x = parseFloat(img.style.left);
-    let y = parseFloat(img.style.top);
-    x += speedX; y += speedY;
-    if(x<0 || x>window.innerWidth) img.style.left = x + "px"; // keep inside screen
-    if(y<0 || y>window.innerHeight) img.style.top = y + "px";
-    img.style.left = x + "px";
-    img.style.top = y + "px";
-    requestAnimationFrame(float);
-  }
-  float();
+  img.src = p.src;
+  img.className="pokemon floating";
+  img.style.width="80px";
+  createFloating(img,(Math.random()-0.5)*0.3,(Math.random()-0.5)*0.3);
 });
-
 </script>
 </body>
 </html>
+
 
