@@ -12,7 +12,6 @@ html, body {
   font-family:'Comic Sans MS', cursive, sans-serif;
   background: linear-gradient(135deg,#ffd6f0,#e6c9ff,#d9b3ff);
   display:flex; justify-content:center; align-items:center;
-  position:relative;
 }
 #background-layer {
   position:absolute; top:0; left:0;
@@ -26,18 +25,18 @@ html, body {
 h1{font-size:3rem; text-shadow:0 0 25px #ffb6c1;}
 h2{font-size:2rem; text-shadow:0 0 15px #ffb6c1;}
 .buttons-wrapper{
-  display:flex; gap:60px; margin-top:20px;
-  align-items:center;
+  display:flex; gap:40px; margin-top:20px;
+  align-items:center; justify-content:center;
+  position:relative;
 }
 button{
   padding:15px 45px; font-size:1.3rem;
   border:none; border-radius:30px; cursor:pointer;
-  background:#ff69b4; color:white; box-shadow:0 0 25px #ffc0cb;
-  transition:0.3s;
+  transition:0.3s; color:white;
 }
-#noBtn{background:#9333ea; color:white;}
+#yesBtn{background:#ff69b4; box-shadow:0 0 25px #ffc0cb;}
+#noBtn{background:#9333ea; box-shadow:0 0 25px #a05aff; position:relative;}
 .floating{position:absolute; z-index:2; pointer-events:none;}
-.pokemon{width:100px;}
 </style>
 </head>
 <body>
@@ -66,59 +65,45 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// Set NO button initial position right next to YES
-function positionNoButton(){
-  const yesRect = yesBtn.getBoundingClientRect();
-  noBtn.style.left = (yesRect.right + 20) + "px";
-  noBtn.style.top = yesRect.top + "px";
+// NO button movement relative to current position
+let noX = 0, noY = 0;
+function initNoPosition(){
+  const rect = noBtn.getBoundingClientRect();
+  noX = 0; // relative to wrapper
+  noY = 0;
+  noBtn.style.transform = `translate(${noX}px, ${noY}px)`;
 }
-positionNoButton();
+initNoPosition();
 
-// NO moves quickly only when mouse is near
+// Mouse-triggered NO movement
 document.addEventListener("mousemove", e=>{
-  const mx = e.clientX, my = e.clientY;
-  const noRect = noBtn.getBoundingClientRect();
-  const cx = noRect.left + noRect.width/2;
-  const cy = noRect.top + noRect.height/2;
-  const dx = mx - cx, dy = my - cy;
+  const rect = noBtn.getBoundingClientRect();
+  const dx = e.clientX - (rect.left + rect.width/2);
+  const dy = e.clientY - (rect.top + rect.height/2);
   const distance = Math.sqrt(dx*dx + dy*dy);
-  const radius = 120;
-  if(distance < radius){
-    const angle = Math.atan2(dy, dx);
-    let newX = parseFloat(noBtn.style.left) - Math.cos(angle)*12;
-    let newY = parseFloat(noBtn.style.top) - Math.sin(angle)*12;
-    // clamp inside viewport
-    newX = Math.max(0, Math.min(window.innerWidth-noRect.width, newX));
-    newY = Math.max(0, Math.min(window.innerHeight-noRect.height, newY));
-    noBtn.style.left = newX + "px";
-    noBtn.style.top = newY + "px";
-    const wiggle = Math.sin(Date.now()/100)*15;
-    noBtn.style.transform = `rotate(${wiggle}deg)`;
+  if(distance < 120){
+    noX -= dx*0.1; // speed
+    noY -= dy*0.1;
+    noBtn.style.transform = `translate(${noX}px, ${noY}px) rotate(${Math.sin(Date.now()/100)*15}deg)`;
   } else {
-    noBtn.style.transform = `rotate(0deg)`;
+    noBtn.style.transform = `translate(${noX}px, ${noY}px) rotate(0deg)`;
   }
 });
 
 // YES button triggers heart fireworks and audio
 yesBtn.addEventListener("click", ()=>{
-  try {
-    audio.currentTime = 0;
-    audio.play();
-  } catch(e){}
-  launchHeartFireworks(canvas.width/2, canvas.height/2);
+  try { audio.currentTime=0; audio.play(); } catch(e){}
+  createHearts(canvas.width/2, canvas.height/2);
 });
 
 // Heart fireworks
-function launchHeartFireworks(x,y){
-  let particles = [];
+function createHearts(x,y){
+  let particles=[];
   for(let i=0;i<200;i++){
     particles.push({
-      x,y,
-      angle:Math.random()*2*Math.PI,
-      speed:Math.random()*4+1.5,
-      size:Math.random()*15+5,
-      color:`hsl(${Math.random()*360},80%,70%)`,
-      life:100
+      x,y, angle:Math.random()*2*Math.PI,
+      speed:Math.random()*4+1.5, size:Math.random()*15+5,
+      color:`hsl(${Math.random()*360},80%,70%)`, life:100
     });
   }
   function drawHeart(x,y,sz,color){
@@ -147,54 +132,46 @@ function launchHeartFireworks(x,y){
   animate();
 }
 
-// Floating background elements
+// Floating elements
 function createFloating(type, content, width, speedX, speedY){
   const el = document.createElement(type);
-  el.className = "floating";
+  el.className="floating";
   if(type==="img") el.src = content;
   else el.innerText = content;
-  if(width) el.style.width = width+"px";
-  el.style.left = Math.random()*(window.innerWidth-100)+"px";
-  el.style.top = Math.random()*(window.innerHeight-100)+"px";
+  if(width) el.style.width=width+"px";
+  el.style.left=Math.random()*(window.innerWidth-100)+"px";
+  el.style.top=Math.random()*(window.innerHeight-100)+"px";
   document.getElementById("background-layer").appendChild(el);
-
   function floatAnim(){
-    let x = parseFloat(el.style.left), y = parseFloat(el.style.top);
-    x += speedX; y += speedY;
-    if(x<0 || x>window.innerWidth-100) speedX *= -1;
-    if(y<0 || y>window.innerHeight-100) speedY *= -1;
-    el.style.left = x+"px";
-    el.style.top = y+"px";
+    let x=parseFloat(el.style.left), y=parseFloat(el.style.top);
+    x+=speedX; y+=speedY;
+    if(x<0 || x>window.innerWidth-100) speedX*=-1;
+    if(y<0 || y>window.innerHeight-100) speedY*=-1;
+    el.style.left=x+"px";
+    el.style.top=y+"px";
     requestAnimationFrame(floatAnim);
   }
   floatAnim();
 }
 
-// Background flowers
-for(let i=0;i<15;i++){
+// Flowers
+for(let i=0;i<15;i++)
   createFloating("div","🌸",null,(Math.random()-0.5)*0.3,(Math.random()-0.5)*0.3);
-}
 
-// Background confetti
-for(let i=0;i<20;i++){
+// Confetti
+for(let i=0;i<20;i++)
   createFloating("div","🎀",null,(Math.random()-0.5)*0.3,(Math.random()-0.5)*0.3);
-}
 
-// Pokémon with better artwork
-const artwork = [
+// Pokémon official artwork
+const pokemonUrls=[
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/872.png", // Belibolt
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/939.png", // Snom
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1016.png", // Tandemaus
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1017.png"  // Maushold
 ];
-
-artwork.forEach(url => {
-  createFloating("img", url, 90, (Math.random()-0.5)*0.2, (Math.random()-0.5)*0.2);
-});
+pokemonUrls.forEach(u=>createFloating("img",u,90,(Math.random()-0.5)*0.2,(Math.random()-0.5)*0.2));
 </script>
 </body>
 </html>
-
-
 
 
