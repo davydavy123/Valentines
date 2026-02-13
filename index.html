@@ -17,6 +17,7 @@ html, body {
   position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-10deg);
   font-size:6rem; color:rgba(255,182,193,0.2); z-index:0; pointer-events:none; text-align:center;
   animation:floatText 8s ease-in-out infinite alternate;
+  white-space: nowrap;
 }
 @keyframes floatText{
   0%{transform:translate(-50%,-52%) rotate(-10deg);}
@@ -50,6 +51,7 @@ canvas{position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:2; poin
 </head>
 <body>
 
+<!-- Floating Stephanie Poetri Text -->
 <div id="bg-text">Stephanie Poetri ❤️ Love You 3000</div>
 
 <div class="container">
@@ -123,15 +125,15 @@ for(let i=0;i<100;i++){
   setInterval(()=>{ let top=parseFloat(c.style.top); top+=dy; if(top>window.innerHeight) top=0; c.style.top=top+"px"; },50);
 }
 
-/* NO button jumpy & playful */
+/* NO button jumpy & playful (ignores mouse) */
 function jumpNo() {
     let newX = Math.random()*(window.innerWidth-noBtn.offsetWidth-10);
     let newY = Math.random()*(window.innerHeight-noBtn.offsetHeight-10);
     noBtn.style.left = newX + "px";
     noBtn.style.top = newY + "px";
-    noBtn.style.transform = `rotate(${Math.random()*30-15}deg)`; // wiggle rotation
+    noBtn.style.transform = `rotate(${Math.random()*30-15}deg)`;
 }
-// Jump every 50ms
+// Jump every 50ms continuously, ignores mouse
 setInterval(jumpNo,50);
 
 /* YES click */
