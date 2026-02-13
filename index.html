@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Goop 💖</title>
+
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    overflow: hidden;
+    color: white;
+}
+
+.container {
+    text-align: center;
+    z-index: 2;
+}
+
+h1 {
+    font-size: 3rem;
+    text-shadow: 0 0 20px pink;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+.buttons {
+    margin-top: 30px;
+    position: relative;
+}
+
+button {
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    margin: 10px;
+    transition: 0.3s;
+}
+
+#yesBtn {
+    background-color: #ff69b4;
+    box-shadow: 0 0 20px white;
+}
+
+#yesBtn:hover {
+    transform: scale(1.1);
+}
+
+#noBtn {
+    background-color: #9333ea;
+    position: absolute;
+}
+
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.pokemon {
+    position: absolute;
+    width: 120px;
+    animation: float 5s ease-in-out infinite;
+    z-index: 0;
+}
+
+/* Floating animation */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-25px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Snom wiggle */
+.wiggle:hover {
+    animation: wiggle 0.4s infinite;
+}
+
+@keyframes wiggle {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(8deg); }
+    50% { transform: rotate(-8deg); }
+    75% { transform: rotate(8deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* Electric spark effect */
+.spark {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: yellow;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: sparkAnim 0.6s forwards;
+}
+
+@keyframes sparkAnim {
+    0% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(3); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Snom -->
+<img class="pokemon wiggle"
+src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png"
+style="top:15%; left:10%;">
+
+<!-- Bellibolt -->
+<img id="bellibolt" class="pokemon"
+src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png"
+style="top:15%; right:10%;">
+
+<div class="container">
+    <h2>My Goop 💜</h2>
+    <h1>Will You Be My Valentine? 💘</h1>
+    <div class="buttons">
+        <button id="yesBtn">Yes 💖</button>
+        <button id="noBtn">No 😢</button>
+    </div>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<audio id="victorySound" 
+src="https://www.myinstants.com/media/sounds/pokemon-level-up-sound-effect.mp3">
+</audio>
+
+<script>
+const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const bellibolt = document.getElementById("bellibolt");
+const victorySound = document.getElementById("victorySound");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+/* Moving No Button */
+function moveNoButton() {
+    const x = Math.random() * (window.innerWidth - 120);
+    const y = Math.random() * (window.innerHeight - 60);
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
+}
+noBtn.addEventListener("mouseover", moveNoButton);
+
+/* Electric Sparks */
+bellibolt.addEventListener("mouseover", () => {
+    for (let i = 0; i < 8; i++) {
+        const spark = document.createElement("div");
+        spark.classList.add("spark");
+        spark.style.left = (bellibolt.offsetLeft + 60 + Math.random()*40) + "px";
+        spark.style.top = (bellibolt.offsetTop + 60 + Math.random()*40) + "px";
+        document.body.appendChild(spark);
+        setTimeout(() => spark.remove(), 600);
+    }
+});
+
+/* Heart Explosion */
+yesBtn.addEventListener("click", () => {
+    victorySound.play();
+    explodeHearts(canvas.width/2, canvas.height/2);
+});
+
+function explodeHearts(x, y) {
+    let particles = [];
+
+    for (let i = 0; i < 120; i++) {
+        particles.push({
+            x: x,
+            y: y,
+            angle: Math.random() * 2 * Math.PI,
+            speed: Math.random() * 6 + 2,
+            size: 20,
+            life: 100
+        });
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach((p, index) => {
+            p.x += Math.cos(p.angle) * p.speed;
+            p.y += Math.sin(p.angle) * p.speed;
+            p.life--;
+
+            ctx.font = p.size + "px Arial";
+            ctx.fillText("💖", p.x, p.y);
+
+            if (p.life <= 0) {
+                particles.splice(index, 1);
+            }
+        });
+
+        if (particles.length > 0) {
+            requestAnimationFrame(animate);
+        }
+    }
+    animate();
+}
+</script>
+
+</body>
+</html>
+
