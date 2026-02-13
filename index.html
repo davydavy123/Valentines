@@ -9,8 +9,8 @@ html, body {
   margin:0; padding:0; width:100vw; height:100vh;
   overflow:hidden;
   font-family:'Comic Sans MS', cursive, sans-serif;
-  display:flex; justify-content:center; align-items:center;
   background: linear-gradient(135deg,#ffd6f0,#e6c9ff,#d9b3ff);
+  position: relative;
 }
 #bg-text{
   position:fixed; top:50%; left:50%;
@@ -26,6 +26,10 @@ html, body {
   50%{transform:translate(-50%,-48%) rotate(-8deg);}
   100%{transform:translate(-50%,-50%) rotate(-10deg);}
 }
+#background-layer{
+  position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;
+  pointer-events:none;
+}
 .container{
   text-align:center; z-index:5; position:relative;
 }
@@ -34,9 +38,11 @@ h2{font-size:2rem; text-shadow:0 0 15px #ffb6c1;}
 button{
   padding:15px 45px; font-size:1.3rem; border:none;
   border-radius:30px; cursor:pointer; margin:10px; transition:0.3s;
+  z-index:6;
+  position:relative;
 }
 #yesBtn{background:#ff69b4; box-shadow:0 0 25px #ffc0cb;}
-#noBtn{background:#9333ea; position:absolute; z-index:6;}
+#noBtn{background:#9333ea; position:absolute;}
 .floating{position:absolute; z-index:2; pointer-events:none;}
 .pokemon{width:80px;}
 </style>
@@ -44,6 +50,8 @@ button{
 <body>
 
 <div id="bg-text">Stephanie Poetri ❤️ Love You 3000</div>
+
+<div id="background-layer"></div>
 
 <div class="container">
   <h2>My Goop 💜</h2>
@@ -112,19 +120,25 @@ function explodeHearts(x,y){
   animate();
 }
 
-// Floating elements
-function createFloating(imgOrDiv, speedX, speedY){
-  let x = Math.random()*(window.innerWidth-50);
-  let y = Math.random()*(window.innerHeight-50);
-  imgOrDiv.style.left = x + "px";
-  imgOrDiv.style.top = y + "px";
-  document.body.appendChild(imgOrDiv);
+// Floating elements creation
+function createFloatingElement(type, content, width, speedX, speedY){
+  const el = document.createElement(type);
+  el.className = "floating";
+  if(type==="img") el.src = content;
+  else el.innerText = content;
+  if(width) el.style.width = width+"px";
+  el.style.left = Math.random()*(window.innerWidth-50)+"px";
+  el.style.top = Math.random()*(window.innerHeight-50)+"px";
+  document.getElementById("background-layer").appendChild(el);
+
   function float(){
+    let x = parseFloat(el.style.left);
+    let y = parseFloat(el.style.top);
     x += speedX; y += speedY;
     if(x<0 || x>window.innerWidth-50) speedX*=-1;
     if(y<0 || y>window.innerHeight-50) speedY*=-1;
-    imgOrDiv.style.left = x+"px";
-    imgOrDiv.style.top = y+"px";
+    el.style.left = x+"px";
+    el.style.top = y+"px";
     requestAnimationFrame(float);
   }
   float();
@@ -132,40 +146,25 @@ function createFloating(imgOrDiv, speedX, speedY){
 
 // Flowers
 for(let i=0;i<15;i++){
-  const f = document.createElement("div");
-  f.className="floating";
-  f.innerText = "🌸";
-  f.style.fontSize = (20+Math.random()*20)+"px";
-  f.style.color = "#ffb6c1";
-  createFloating(f,(Math.random()-0.5)*0.3,(Math.random()-0.5)*0.3);
+  createFloatingElement("div","🌸",null,(Math.random()-0.5)*0.3,(Math.random()-0.5)*0.3);
 }
 
 // Confetti
 for(let i=0;i<20;i++){
-  const c = document.createElement("div");
-  c.className="floating";
-  c.innerText = "🎀";
-  c.style.fontSize = (15+Math.random()*10)+"px";
-  createFloating(c,(Math.random()-0.5)*0.3,(Math.random()-0.5)*0.3);
+  createFloatingElement("div","🎀",null,(Math.random()-0.5)*0.3,(Math.random()-0.5)*0.3);
 }
 
-// Pokémon
-const pokeSrcs=[
-  {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png", name:"Belibolt"},
-  {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png", name:"Snom"},
-  {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1016.png", name:"Tandemaus"},
-  {src:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1017.png", name:"Mousehauld"}
+// Pokémon: Belibolt, Snom, Tandemaus, Mousehauld
+const pokeData=[
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png", // Belibolt
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png", // Snom
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1016.png", // Tandemaus
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1017.png"  // Mousehauld
 ];
 
-pokeSrcs.forEach(p=>{
-  const img = document.createElement("img");
-  img.src = p.src;
-  img.className="pokemon floating";
-  img.style.width="80px";
-  createFloating(img,(Math.random()-0.5)*0.3,(Math.random()-0.5)*0.3);
+pokeData.forEach(src=>{
+  createFloatingElement("img", src, 80, (Math.random()-0.5)*0.2, (Math.random()-0.5)*0.2);
 });
 </script>
 </body>
 </html>
-
-
