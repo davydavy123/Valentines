@@ -56,7 +56,7 @@ h2 { font-size:2rem; text-shadow:0 0 15px #ffb6c1; }
     cursor:pointer;
     margin:10px;
     transition:0.3s;
-    position: relative; /* inline inside container */
+    position: relative;
 }
 
 #yesBtn { background-color:#ff69b4; box-shadow:0 0 25px #ffc0cb; animation: pulse 2s infinite; }
@@ -68,24 +68,16 @@ h2 { font-size:2rem; text-shadow:0 0 15px #ffb6c1; }
     100% { transform: scale(1); box-shadow:0 0 20px #ffb6c1; }
 }
 
-.pokemon {
+.pokemon, .flower, .confetti {
     position:absolute;
-    width:120px;
-    animation: float 5s ease-in-out infinite;
     z-index:3;
-    image-rendering: pixelated;
-    filter: drop-shadow(0 0 15px rgba(255,192,203,0.7));
-}
-@keyframes float {
-    0% { transform: translate(0,0); }
-    25% { transform: translate(5px,-10px); }
-    50% { transform: translate(-5px,-20px); }
-    75% { transform: translate(5px,-10px); }
-    100% { transform: translate(0,0); }
 }
 
+.pokemon { width:120px; animation: float 5s ease-in-out infinite; image-rendering: pixelated; filter: drop-shadow(0 0 15px rgba(255,192,203,0.7)); }
+@keyframes float { 0%{transform:translate(0,0);}25%{transform:translate(5px,-10px);}50%{transform:translate(-5px,-20px);}75%{transform:translate(5px,-10px);}100%{transform:translate(0,0);} }
+
 .poke-heart { position:absolute; font-size:15px; animation: floatPokeHeart 2s infinite; pointer-events:none; }
-@keyframes floatPokeHeart { 0% {transform:translate(0,0) scale(0.8); opacity:1;} 50% {transform:translate(5px,-10px) scale(1.2); opacity:0.8;} 100% {transform:translate(0,0) scale(1); opacity:1;} }
+@keyframes floatPokeHeart {0%{transform:translate(0,0) scale(0.8);opacity:1;}50%{transform:translate(5px,-10px) scale(1.2);opacity:0.8;}100%{transform:translate(0,0) scale(1);opacity:1;}}
 
 canvas { position: fixed; top:0; left:0; width:100vw; height:100vh; z-index:2; pointer-events:none; }
 
@@ -136,13 +128,10 @@ const pokeSrcs=[
 "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/175.png",
 "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png"
 ];
-
 pokeSrcs.forEach(src=>{
-    const img=document.createElement("img");
-    img.src=src; img.className="pokemon";
+    const img=document.createElement("img"); img.src=src; img.className="pokemon";
     img.onload=()=>placeInsideViewport(img);
     document.body.appendChild(img);
-
     setInterval(()=>{
         const h=document.createElement("div"); h.className="poke-heart"; h.innerText="💖";
         const rect=img.getBoundingClientRect();
@@ -153,51 +142,61 @@ pokeSrcs.forEach(src=>{
     },800);
 });
 
+/* Floating flowers */
+const flowerColors=["#ffb6c1","#ffc0cb","#ff69b4","#d9b3ff","#e6c9ff"];
+for(let i=0;i<15;i++){
+    const f=document.createElement("div"); f.className="flower"; f.innerText="🌸";
+    f.style.fontSize=(20+Math.random()*30)+"px";
+    f.style.color=flowerColors[Math.floor(Math.random()*flowerColors.length)];
+    placeInsideViewport(f);
+    document.body.appendChild(f);
+    let dy=0.5+Math.random(); // floating speed
+    setInterval(()=>{ let top=parseFloat(f.style.top); top+=dy; if(top>window.innerHeight) top=0; f.style.top=top+"px"; }, 50);
+}
+
+/* Confetti */
+for(let i=0;i<50;i++){
+    const c=document.createElement("div"); c.className="confetti"; c.innerText="🎀";
+    c.style.fontSize=(15+Math.random()*15)+"px";
+    placeInsideViewport(c);
+    document.body.appendChild(c);
+    let dy=1+Math.random();
+    setInterval(()=>{ let top=parseFloat(c.style.top); top+=dy; if(top>window.innerHeight) top=0; c.style.top=top+"px"; }, 50);
+}
+
 /* NO button chase */
 let mouseX=0, mouseY=0;
-let noX=window.innerWidth/2+100;
-let noY=window.innerHeight/2;
+let noX=window.innerWidth/2+100; let noY=window.innerHeight/2;
 noBtn.style.left=noX+"px"; noBtn.style.top=noY+"px";
-
 document.addEventListener("mousemove", e => { mouseX=e.clientX; mouseY=e.clientY; });
-
 function chaseNoButton(){
     const dx=noX-mouseX, dy=noY-mouseY;
     const dist=Math.sqrt(dx*dx + dy*dy);
     if(dist<200){
-        noX += (dx/dist)*12;
-        noY += (dy/dist)*12;
+        noX += (dx/dist)*12; noY += (dy/dist)*12;
         noX = Math.max(10, Math.min(window.innerWidth-noBtn.offsetWidth-10, noX));
         noY = Math.max(10, Math.min(window.innerHeight-noBtn.offsetHeight-10, noY));
-        noBtn.style.left=noX+"px";
-        noBtn.style.top=noY+"px";
+        noBtn.style.left=noX+"px"; noBtn.style.top=noY+"px";
     }
     requestAnimationFrame(chaseNoButton);
 }
 chaseNoButton();
 
-/* YES button click */
+/* YES click */
 yesBtn.addEventListener("click", ()=>{
-    stephSound.currentTime=0;
-    stephSound.play().catch(e=>console.log("Sound blocked until click"));
+    stephSound.currentTime=0; stephSound.play().catch(()=>{});
     explodeHearts(canvas.width/2,canvas.height/2);
 });
 
 /* Heart explosion */
 function explodeHearts(x,y){
-    let particles=[];
-    const count=window.innerWidth<768?80:150;
-    for(let i=0;i<count;i++){
-        particles.push({x:x,y:y,angle:Math.random()*2*Math.PI,speed:Math.random()*6+2,size:25,life:100});
-    }
+    let particles=[]; const count=window.innerWidth<768?80:150;
+    for(let i=0;i<count;i++){ particles.push({x:x,y:y,angle:Math.random()*2*Math.PI,speed:Math.random()*6+2,size:25,life:100}); }
     function animate(){
         ctx.clearRect(0,0,canvas.width,canvas.height);
         particles.forEach((p,index)=>{
-            p.x+=Math.cos(p.angle)*p.speed;
-            p.y+=Math.sin(p.angle)*p.speed;
-            p.life--;
-            ctx.font=p.size+"px Arial";
-            ctx.fillText("💖",p.x,p.y);
+            p.x+=Math.cos(p.angle)*p.speed; p.y+=Math.sin(p.angle)*p.speed; p.life--;
+            ctx.font=p.size+"px Arial"; ctx.fillText("💖",p.x,p.y);
             if(p.life<=0) particles.splice(index,1);
         });
         if(particles.length>0) requestAnimationFrame(animate);
@@ -207,4 +206,5 @@ function explodeHearts(x,y){
 </script>
 </body>
 </html>
+
 
