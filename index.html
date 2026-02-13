@@ -123,25 +123,28 @@ for(let i=0;i<100;i++){
   setInterval(()=>{ let top=parseFloat(c.style.top); top+=dy; if(top>window.innerHeight) top=0; c.style.top=top+"px"; },50);
 }
 
-/* NO button continuous playful movement */
+/* NO button teleporting */
 let noX=Math.random()*(window.innerWidth-100);
 let noY=Math.random()*(window.innerHeight-50);
-let noVX=(Math.random()*4+2)*(Math.random()<0.5?-1:1);
-let noVY=(Math.random()*4+2)*(Math.random()<0.5?-1:1);
 noBtn.style.left=noX+"px"; noBtn.style.top=noY+"px";
 
 function moveNo(){
-  noX+=noVX; noY+=noVY;
-  if(noX<0||noX>window.innerWidth-noBtn.offsetWidth) noVX*=-1;
-  if(noY<0||noY>window.innerHeight-noBtn.offsetHeight) noVY*=-1;
-  noBtn.style.left=noX+"px"; noBtn.style.top=noY+"px";
+  noX+=Math.random()*8-4;
+  noY+=Math.random()*8-4;
+  // If it hits edges, teleport randomly
+  if(noX<0||noX>window.innerWidth-noBtn.offsetWidth||noY<0||noY>window.innerHeight-noBtn.offsetHeight){
+    noX=Math.random()*(window.innerWidth-noBtn.offsetWidth-10);
+    noY=Math.random()*(window.innerHeight-noBtn.offsetHeight-10);
+  }
+  noBtn.style.left=noX+"px";
+  noBtn.style.top=noY+"px";
   requestAnimationFrame(moveNo);
 }
 moveNo();
 
 /* YES click */
 yesBtn.addEventListener("click",()=>{
-  stephSound.currentTime=0; stephSound.play().catch(()=>{});
+  try{ stephSound.currentTime=0; stephSound.play(); } catch(e){}
   explodeHearts(canvas.width/2,canvas.height/2);
 });
 
