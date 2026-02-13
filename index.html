@@ -34,14 +34,15 @@ button{
 }
 #yesBtn{background:#ff69b4; box-shadow:0 0 25px #ffc0cb;}
 #noBtn{background:#9333ea; position:absolute;}
-.pokemon, .flower, .confetti{position:absolute; z-index:3;}
+.particle, .pokemon, .flower, .confetti{
+  position:absolute; z-index:3; pointer-events:none;
+}
 .pokemon{width:120px; animation: float 5s ease-in-out infinite;}
 @keyframes float{
   0%{transform:translate(0,0);}25%{transform:translate(5px,-10px);}
   50%{transform:translate(-5px,-20px);}75%{transform:translate(5px,-10px);}
   100%{transform:translate(0,0);}
 }
-canvas{position:fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none;}
 </style>
 </head>
 <body>
@@ -65,34 +66,40 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// Smooth bouncing NO button
-let noX = 100; // starting X
-let noY = 100; // starting Y
-let vx = 6;    // speed X
-let vy = 4;    // speed Y
+// NO button moves only when mouse is close
+let noX = window.innerWidth/2 - 50;
+let noY = window.innerHeight/2 + 50;
+noBtn.style.left = noX+"px";
+noBtn.style.top = noY+"px";
 
-function animateNo(){
-  noX += vx;
-  noY += vy;
+document.addEventListener("mousemove", e=>{
+  const mx = e.clientX;
+  const my = e.clientY;
+  const dx = mx - (noX + noBtn.offsetWidth/2);
+  const dy = my - (noY + noBtn.offsetHeight/2);
+  const distance = Math.sqrt(dx*dx + dy*dy);
+  const radius = 100; // distance to start moving
+  if(distance < radius){
+    // move away
+    const angle = Math.atan2(dy, dx);
+    noX -= Math.cos(angle)*8;
+    noY -= Math.sin(angle)*8;
+    // keep inside screen
+    noX = Math.max(0, Math.min(window.innerWidth - noBtn.offsetWidth, noX));
+    noY = Math.max(0, Math.min(window.innerHeight - noBtn.offsetHeight, noY));
+    noBtn.style.left = noX + "px";
+    noBtn.style.top = noY + "px";
+  }
+});
 
-  // Bounce off edges
-  if(noX <= 0 || noX >= window.innerWidth - noBtn.offsetWidth) vx *= -1;
-  if(noY <= 0 || noY >= window.innerHeight - noBtn.offsetHeight) vy *= -1;
-
-  noBtn.style.left = noX + "px";
-  noBtn.style.top = noY + "px";
-
-  requestAnimationFrame(animateNo);
-}
-animateNo();
-
-// YES button triggers hearts only
+// YES button triggers hearts
 yesBtn.addEventListener("click",()=>{
   explodeHearts(canvas.width/2,canvas.height/2);
 });
 
+// Hearts animation
 function explodeHearts(x,y){
-  let particles=[]; const count = window.innerWidth<768?100:200;
+  let particles=[]; const count = 150;
   for(let i=0;i<count;i++){
     particles.push({x:x,y:y,angle:Math.random()*2*Math.PI,speed:Math.random()*6+2,size:25,life:100});
   }
@@ -110,41 +117,54 @@ function explodeHearts(x,y){
   animate();
 }
 
-// Pokémon, flowers, confetti
-function placeInsideViewport(el){
-  const w=el.offsetWidth||50,h=el.offsetHeight||50;
-  el.style.left=Math.random()*(window.innerWidth-w-20)+"px";
-  el.style.top=Math.random()*(window.innerHeight-h-20)+"px";
+// Floating background flowers/petals/confetti
+function createFloating(element,text,color,size){
+  element.innerText = text;
+  element.style.fontSize = size+"px";
+  element.style.color = color;
+  element.style.left = Math.random()*window.innerWidth+"px";
+  element.style.top = Math.random()*window.innerHeight+"px";
+  document.body.appendChild(element);
+
+  let dx = (Math.random()-0.5)*1.5;
+  let dy = (Math.random()-0.5)*1.5;
+  function float(){
+    let x = parseFloat(element.style.left);
+    let y = parseFloat(element.style.top);
+    x += dx; y += dy;
+    if(x<0 || x>window.innerWidth) dx*=-1;
+    if(y<0 || y>window.innerHeight) dy*=-1;
+    element.style.left = x+"px";
+    element.style.top = y+"px";
+    requestAnimationFrame(float);
+  }
+  float();
 }
 
-// Pokémon
+// Add flowers
+for(let i=0;i<15;i++){
+  const f=document.createElement("div");
+  createFloating(f,"🌸","#ffb6c1",20+Math.random()*20);
+}
+
+// Add confetti
+for(let i=0;i<20;i++){
+  const c=document.createElement("div");
+  createFloating(c,"🎀","#ffc0cb",15+Math.random()*10);
+}
+
+// Add Pokémon
 const pokeSrcs=[
-"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png",
-"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png"
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png",
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png"
 ];
 pokeSrcs.forEach(src=>{
   const img=document.createElement("img"); img.src=src; img.className="pokemon";
-  img.onload=()=>placeInsideViewport(img);
+  img.style.left = Math.random()*window.innerWidth+"px";
+  img.style.top = Math.random()*window.innerHeight+"px";
   document.body.appendChild(img);
 });
 
-// Flowers
-const flowerColors=["#ffb6c1","#ffc0cb","#ff69b4","#d9b3ff","#e6c9ff"];
-for(let i=0;i<20;i++){
-  const f=document.createElement("div"); f.className="flower"; f.innerText="🌸";
-  f.style.fontSize=(20+Math.random()*30)+"px";
-  f.style.color=flowerColors[Math.floor(Math.random()*flowerColors.length)];
-  placeInsideViewport(f);
-  document.body.appendChild(f);
-}
-
-// Confetti
-for(let i=0;i<50;i++){
-  const c=document.createElement("div"); c.className="confetti"; c.innerText="🎀";
-  c.style.fontSize=(15+Math.random()*15)+"px";
-  placeInsideViewport(c);
-  document.body.appendChild(c);
-}
 </script>
 </body>
 </html>
