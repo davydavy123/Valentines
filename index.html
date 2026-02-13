@@ -46,7 +46,7 @@ button{
 .floating{position:absolute; z-index:2; pointer-events:none;}
 .pokemon{width:80px;}
 .buttons-wrapper{
-  position:relative; display:flex; justify-content:center; gap:40px; margin-top:20px;
+  display:flex; justify-content:center; gap:40px; position:relative;
 }
 </style>
 </head>
@@ -74,14 +74,14 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// NO button starting position relative to wrapper
-let wrapperRect = document.querySelector('.buttons-wrapper').getBoundingClientRect();
-let noX = wrapperRect.left + 200; // initial position
-let noY = wrapperRect.top;
+// Center NO button initially
+let noX = canvas.width/2 + 100;
+let noY = canvas.height/2 + 60;
 noBtn.style.left = noX + "px";
 noBtn.style.top = noY + "px";
 
-// NO moves quickly only when mouse is near
+// NO button movement + wiggle on hover
+let wiggleAngle = 0;
 document.addEventListener("mousemove", e=>{
   const mx = e.clientX;
   const my = e.clientY;
@@ -91,32 +91,50 @@ document.addEventListener("mousemove", e=>{
   const radius = 120;
   if(distance < radius){
     const angle = Math.atan2(dy, dx);
-    noX -= Math.cos(angle)*12; // fast
+    noX -= Math.cos(angle)*12; // fast movement
     noY -= Math.sin(angle)*12;
     noX = Math.max(0, Math.min(window.innerWidth - noBtn.offsetWidth, noX));
     noY = Math.max(0, Math.min(window.innerHeight - noBtn.offsetHeight, noY));
     noBtn.style.left = noX + "px";
     noBtn.style.top = noY + "px";
+
+    // Wiggle effect
+    wiggleAngle = Math.sin(Date.now()/100)*15;
+    noBtn.style.transform = `rotate(${wiggleAngle}deg)`;
+  } else {
+    noBtn.style.transform = `rotate(0deg)`;
   }
 });
 
-// YES button triggers fireworks
+// YES button triggers heart fireworks
 yesBtn.addEventListener("click",()=>{
-  createFireworks(canvas.width/2, canvas.height/2);
+  createHeartFireworks(canvas.width/2, canvas.height/2);
 });
 
-// Fireworks animation
-function createFireworks(x,y){
+// Heart-shaped fireworks
+function createHeartFireworks(x, y){
   let particles=[];
   for(let i=0;i<200;i++){
     particles.push({
       x:x, y:y,
       angle:Math.random()*2*Math.PI,
       speed:Math.random()*5+2,
-      size:Math.random()*8+4,
-      color:`hsl(${Math.random()*360},80%,70%)`,
-      life:100
+      size:Math.random()*15+5,
+      life:100,
+      color:`hsl(${Math.random()*360},80%,70%)`
     });
+  }
+  function drawHeart(x,y,size,color){
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.scale(size/30,size/30);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.bezierCurveTo(-1,-1,-5,-5,0,-7);
+    ctx.bezierCurveTo(5,-5,1,-1,0,0);
+    ctx.fill();
+    ctx.restore();
   }
   function animate(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -124,10 +142,7 @@ function createFireworks(x,y){
       p.x += Math.cos(p.angle)*p.speed;
       p.y += Math.sin(p.angle)*p.speed;
       p.life--;
-      ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
-      ctx.fill();
+      drawHeart(p.x,p.y,p.size,p.color);
       if(p.life<=0) particles.splice(index,1);
     });
     if(particles.length>0) requestAnimationFrame(animate);
@@ -135,7 +150,7 @@ function createFireworks(x,y){
   animate();
 }
 
-// Floating background elements
+// Floating elements
 function createFloatingElement(type, content, width, speedX, speedY){
   const el = document.createElement(type);
   el.className = "floating";
@@ -183,4 +198,5 @@ pokeData.forEach(src=>{
 </script>
 </body>
 </html>
+
 
