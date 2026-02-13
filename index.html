@@ -9,7 +9,7 @@
 body {
     margin: 0;
     height: 100vh;
-    background: linear-gradient(135deg, #f7c6f3, #d8b4f8);
+    background: linear-gradient(135deg, #ffd6f0, #e6c9ff, #d9b3ff);
     overflow: hidden;
     font-family: 'Comic Sans MS', cursive, sans-serif;
     display: flex;
@@ -18,7 +18,16 @@ body {
     color: white;
 }
 
-/* Container text */
+#glow-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 192, 203, 0.25), transparent 70%), 
+                radial-gradient(circle at 70% 70%, rgba(200, 180, 255, 0.2), transparent 60%);
+    z-index: 0;
+}
+
 .container {
     text-align: center;
     z-index: 5;
@@ -60,7 +69,6 @@ button {
     position: absolute;
 }
 
-/* YES button pulse */
 @keyframes pulse {
     0% { transform: scale(1); box-shadow: 0 0 20px #ffb6c1; }
     50% { transform: scale(1.1); box-shadow: 0 0 35px #ff69b4; }
@@ -75,13 +83,13 @@ canvas {
     z-index: 1;
 }
 
-/* Pokémon styling */
 .pokemon {
     position: absolute;
     width: 160px;
     animation: float 5s ease-in-out infinite;
     z-index: 3;
-    image-rendering: pixelated; /* keeps sprite crisp */
+    image-rendering: pixelated;
+    filter: drop-shadow(0 0 15px rgba(255,192,203,0.7));
 }
 
 @keyframes float {
@@ -90,12 +98,6 @@ canvas {
     100% { transform: translateY(0px); }
 }
 
-/* Snom glow */
-.snom-glow {
-    filter: drop-shadow(0 0 15px #ccefff);
-}
-
-/* Bellibolt rainbow spark */
 .bellibolt-spark {
     position: absolute;
     width: 15px;
@@ -110,7 +112,6 @@ canvas {
     100% { opacity: 0; transform: scale(3); }
 }
 
-/* Heart particles */
 .heart-particle {
     position: absolute;
     font-size: 20px;
@@ -122,36 +123,35 @@ canvas {
     100% { opacity: 0; transform: translate(calc(50px - 100px*var(--randX)), -80px) scale(1.5); }
 }
 
-/* Background floating hearts */
 .background-heart {
     position: absolute;
     font-size: 25px;
     animation: drift linear infinite;
     opacity: 0.7;
+    filter: drop-shadow(0 0 8px rgba(255, 182, 193,0.7));
 }
 
-/* Background twinkles */
+.flower {
+    position: absolute;
+    width: 30px;
+    opacity: 0.7;
+    animation: floatFlower linear infinite;
+    pointer-events: none;
+}
+
 .background-twinkle {
     position: absolute;
-    width: 4px;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.7);
+    width: 5px;
+    height: 5px;
+    background: rgba(255,255,255,0.8);
     border-radius: 50%;
-    animation: twinkle 2s infinite;
+    animation: sparkle 4s linear infinite;
 }
 
-@keyframes drift {
-    0% { transform: translateY(0) rotate(0deg); }
-    100% { transform: translateY(-1200px) rotate(360deg); }
-}
+@keyframes drift { 0% { transform: translateY(0) rotate(0deg);} 100% { transform: translateY(-1200px) rotate(360deg); }}
+@keyframes floatFlower { 0% { transform: translateY(0) rotate(0deg); opacity:0.7;} 50% { transform: translateY(-100px) rotate(180deg); opacity:1;} 100% { transform: translateY(0px) rotate(360deg); opacity:0.7;}}
+@keyframes sparkle { 0% { transform: translate(0,0) scale(1); opacity:0.5; } 50% { transform: translate(20px,-40px) scale(1.3); opacity:1; } 100% { transform: translate(0,0) scale(1); opacity:0.5; } }
 
-@keyframes twinkle {
-    0% { opacity: 0.2; transform: scale(0.5); }
-    50% { opacity: 1; transform: scale(1); }
-    100% { opacity: 0.2; transform: scale(0.5); }
-}
-
-/* Mobile adjustments */
 @media (max-width: 768px) {
     h1 { font-size: 2rem; }
     h2 { font-size: 1.5rem; }
@@ -162,7 +162,11 @@ canvas {
 </head>
 <body>
 
-<!-- Pokémon -->
+<div id="glow-overlay"></div>
+<div id="flower-container"></div>
+<div id="heart-container"></div>
+<div id="twinkle-container"></div>
+
 <img class="pokemon snom-glow snom" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png" style="top:5%; left:5%; animation-delay:0s;">
 <img class="pokemon snom-glow snom" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png" style="top:20%; right:10%; animation-delay:1s;">
 <img class="pokemon snom-glow snom" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png" style="bottom:10%; left:15%; animation-delay:2s;">
@@ -172,16 +176,12 @@ canvas {
 <img id="bellibolt3" class="pokemon bellibolt" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png" style="bottom:15%; left:50%; animation-delay:2s;">
 <img id="bellibolt4" class="pokemon bellibolt" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png" style="bottom:10%; right:40%; animation-delay:3s;">
 
-<!-- Background containers -->
-<div id="heart-container"></div>
-<div id="twinkle-container"></div>
-
 <div class="container">
     <h2>My Goop 💜</h2>
     <h1>Will You Be My Valentine? 💘</h1>
     <div class="buttons">
         <button id="yesBtn">Yes 💖</button>
-        <button id="noBtn">No 😢</button>
+        <button id="noBtn">No 😆</button>
     </div>
 </div>
 
@@ -199,45 +199,54 @@ const victorySound = document.getElementById("victorySound");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-/* No button escape + wiggle (hover + touch) */
-function moveNoButton() {
-    const x = Math.random() * (window.innerWidth - 120);
-    const y = Math.random() * (window.innerHeight - 60);
-    noBtn.style.transition = "all 0.2s ease";
-    noBtn.style.left = x + "px";
-    noBtn.style.top = y + "px";
-    noBtn.style.transform = "rotate(-15deg)";
-    setTimeout(()=>{ noBtn.style.transform="rotate(15deg)"; },100);
-    setTimeout(()=>{ noBtn.style.transform="rotate(0deg)"; },200);
-}
-noBtn.addEventListener("mouseover", moveNoButton);
-noBtn.addEventListener("mousemove", moveNoButton);
-noBtn.addEventListener("touchstart", moveNoButton);
+/* NO button chases cursor + random jumps */
+let mouseX=0, mouseY=0;
+let noX=window.innerWidth/2, noY=window.innerHeight/2;
+const speed=6;
+document.addEventListener("mousemove", e => { mouseX=e.clientX; mouseY=e.clientY; });
 
-/* Bellibolt hover → rainbow sparks */
-bellibolts.forEach(b => {
-    b.addEventListener("mouseover", () => {
+function chaseNoButton() {
+    const dx = noX - mouseX;
+    const dy = noY - mouseY;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if(dist < 150) {
+        noX += (dx/dist)*speed;
+        noY += (dy/dist)*speed;
+        noX = Math.max(0, Math.min(window.innerWidth - noBtn.offsetWidth, noX));
+        noY = Math.max(0, Math.min(window.innerHeight - noBtn.offsetHeight, noY));
+        noBtn.style.left=noX+"px";
+        noBtn.style.top=noY+"px";
+        noBtn.style.transform=`rotate(${Math.random()*60-30}deg)`;
+    }
+    requestAnimationFrame(chaseNoButton);
+}
+chaseNoButton();
+setInterval(()=>{ if(Math.random()<0.1){ noX=Math.random()*(window.innerWidth-noBtn.offsetWidth); noY=Math.random()*(window.innerHeight-noBtn.offsetHeight); } },1000);
+
+/* Bellibolt sparks */
+bellibolts.forEach(b=>{
+    b.addEventListener("mouseover", ()=>{
         const sparkCount = window.innerWidth < 768 ? 6 : 12;
-        for (let i=0;i<sparkCount;i++){
-            const spark = document.createElement("div");
+        for(let i=0;i<sparkCount;i++){
+            const spark=document.createElement("div");
             spark.classList.add("bellibolt-spark");
-            spark.style.left = (b.offsetLeft + 60 + Math.random()*60) + "px";
-            spark.style.top = (b.offsetTop + 60 + Math.random()*60) + "px";
-            spark.style.backgroundColor = `hsl(${Math.random()*360},100%,70%)`;
+            spark.style.left=(b.offsetLeft+60+Math.random()*60)+"px";
+            spark.style.top=(b.offsetTop+60+Math.random()*60)+"px";
+            spark.style.backgroundColor=`hsl(${Math.random()*360},100%,70%)`;
             document.body.appendChild(spark);
             setTimeout(()=>spark.remove(),600);
         }
     });
 });
 
-/* Snom click → tiny hearts */
-snoms.forEach(s => {
-    s.addEventListener("click", (e)=>{
+/* Snom click hearts */
+snoms.forEach(s=>{
+    s.addEventListener("click", e=>{
         for(let i=0;i<6;i++){
-            const heart = document.createElement("div");
+            const heart=document.createElement("div");
             heart.className="heart-particle";
-            heart.style.left = e.pageX + "px";
-            heart.style.top = e.pageY + "px";
+            heart.style.left=e.pageX+"px";
+            heart.style.top=e.pageY+"px";
             heart.style.setProperty('--randX', Math.random());
             document.body.appendChild(heart);
             setTimeout(()=>heart.remove(),1000);
@@ -245,16 +254,16 @@ snoms.forEach(s => {
     });
 });
 
-/* Bellibolt click → rainbow sparks */
-bellibolts.forEach(b => {
+/* Bellibolt click sparks */
+bellibolts.forEach(b=>{
     b.addEventListener("click", ()=>{
         const sparkCount = window.innerWidth < 768 ? 6 : 12;
         for(let i=0;i<sparkCount;i++){
-            const spark = document.createElement("div");
+            const spark=document.createElement("div");
             spark.classList.add("bellibolt-spark");
-            spark.style.left = (b.offsetLeft + 60 + Math.random()*60) + "px";
-            spark.style.top = (b.offsetTop + 60 + Math.random()*60) + "px";
-            spark.style.backgroundColor = `hsl(${Math.random()*360},100%,70%)`;
+            spark.style.left=(b.offsetLeft+60+Math.random()*60)+"px";
+            spark.style.top=(b.offsetTop+60+Math.random()*60)+"px";
+            spark.style.backgroundColor=`hsl(${Math.random()*360},100%,70%)`;
             document.body.appendChild(spark);
             setTimeout(()=>spark.remove(),600);
         }
@@ -262,31 +271,25 @@ bellibolts.forEach(b => {
 });
 
 /* YES button heart explosion */
-yesBtn.addEventListener("click", () => {
+yesBtn.addEventListener("click", ()=>{
     victorySound.play();
-    explodeHearts(canvas.width/2, canvas.height/2);
+    explodeHearts(canvas.width/2,canvas.height/2);
 });
 
+/* Heart explosion */
 function explodeHearts(x,y){
     let particles=[];
     const count = window.innerWidth < 768 ? 80 : 150;
     for(let i=0;i<count;i++){
-        particles.push({
-            x:x,
-            y:y,
-            angle:Math.random()*2*Math.PI,
-            speed:Math.random()*6+2,
-            size:25,
-            life:100
-        });
+        particles.push({x:x,y:y,angle:Math.random()*2*Math.PI,speed:Math.random()*6+2,size:25,life:100});
     }
     function animate(){
         ctx.clearRect(0,0,canvas.width,canvas.height);
         particles.forEach((p,index)=>{
-            p.x += Math.cos(p.angle)*p.speed;
-            p.y += Math.sin(p.angle)*p.speed;
+            p.x+=Math.cos(p.angle)*p.speed;
+            p.y+=Math.sin(p.angle)*p.speed;
             p.life--;
-            ctx.font = p.size+"px Arial";
+            ctx.font=p.size+"px Arial";
             ctx.fillText("💖",p.x,p.y);
             if(p.life<=0) particles.splice(index,1);
         });
@@ -295,29 +298,44 @@ function explodeHearts(x,y){
     animate();
 }
 
-/* Background floating hearts */
-const heartContainer = document.getElementById("heart-container");
-const heartCount = window.innerWidth < 768 ? 15 : 30;
+/* Background hearts */
+const heartContainer=document.getElementById("heart-container");
+const heartCount=window.innerWidth<768?15:30;
 for(let i=0;i<heartCount;i++){
-    const heart = document.createElement("div");
+    const heart=document.createElement("div");
     heart.className="background-heart";
-    heart.style.left = Math.random()*window.innerWidth + "px";
-    heart.style.bottom = Math.random()*window.innerHeight + "px";
-    heart.style.fontSize = (15 + Math.random()*20)+"px";
-    heart.style.animationDuration = (5+Math.random()*5)+"s";
-    heart.innerText = "💖";
+    heart.style.left=Math.random()*window.innerWidth+"px";
+    heart.style.bottom=Math.random()*window.innerHeight+"px";
+    heart.style.fontSize=(15+Math.random()*20)+"px";
+    heart.style.animationDuration=(5+Math.random()*5)+"s";
+    heart.innerText="💖";
     heartContainer.appendChild(heart);
 }
 
 /* Background twinkles */
-const twinkleContainer = document.getElementById("twinkle-container");
+const twinkleContainer=document.getElementById("twinkle-container");
 for(let i=0;i<50;i++){
-    const tw = document.createElement("div");
-    tw.className = "background-twinkle";
-    tw.style.left = Math.random()*window.innerWidth + "px";
-    tw.style.top = Math.random()*window.innerHeight + "px";
-    tw.style.animationDuration = (1+Math.random()*2)+"s";
+    const tw=document.createElement("div");
+    tw.className="background-twinkle";
+    tw.style.left=Math.random()*window.innerWidth+"px";
+    tw.style.top=Math.random()*window.innerHeight+"px";
+    tw.style.animationDuration=(1+Math.random()*2)+"s";
     twinkleContainer.appendChild(tw);
+}
+
+/* Background flowers */
+const flowerContainer=document.getElementById("flower-container");
+const flowerImages=["https://i.ibb.co/mC0H1Pr/pastel-flower1.png","https://i.ibb.co/vzB8k9B/pastel-flower2.png","https://i.ibb.co/7Y7C5K7/pastel-flower3.png"];
+const flowerCount=window.innerWidth<768?10:20;
+for(let i=0;i<flowerCount;i++){
+    const flower=document.createElement("img");
+    flower.src=flowerImages[Math.floor(Math.random()*flowerImages.length)];
+    flower.className="flower";
+    flower.style.left=Math.random()*window.innerWidth+"px";
+    flower.style.top=Math.random()*window.innerHeight+"px";
+    flower.style.width=(20+Math.random()*20)+"px";
+    flower.style.animationDuration=(5+Math.random()*5)+"s";
+    flowerContainer.appendChild(flower);
 }
 </script>
 </body>
