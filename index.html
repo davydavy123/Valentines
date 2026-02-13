@@ -62,7 +62,7 @@ canvas{position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:2; poin
 </div>
 
 <canvas id="canvas"></canvas>
-<audio id="stephSound" src="YOUR_PUBLIC_MP3_URL_HERE" preload="auto"></audio>
+<audio id="stephSound" src="https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" preload="auto"></audio>
 
 <script>
 const canvas=document.getElementById("canvas");
@@ -123,16 +123,16 @@ for(let i=0;i<100;i++){
   setInterval(()=>{ let top=parseFloat(c.style.top); top+=dy; if(top>window.innerHeight) top=0; c.style.top=top+"px"; },50);
 }
 
-/* NO button teleporting */
+/* NO button super fast teleporting */
 let noX=Math.random()*(window.innerWidth-100);
 let noY=Math.random()*(window.innerHeight-50);
 noBtn.style.left=noX+"px"; noBtn.style.top=noY+"px";
 
 function moveNo(){
-  noX+=Math.random()*8-4;
-  noY+=Math.random()*8-4;
-  // If it hits edges, teleport randomly
+  noX+=Math.random()*12-6; // increase speed
+  noY+=Math.random()*12-6;
   if(noX<0||noX>window.innerWidth-noBtn.offsetWidth||noY<0||noY>window.innerHeight-noBtn.offsetHeight){
+    // teleport instead of bouncing
     noX=Math.random()*(window.innerWidth-noBtn.offsetWidth-10);
     noY=Math.random()*(window.innerHeight-noBtn.offsetHeight-10);
   }
@@ -144,7 +144,11 @@ moveNo();
 
 /* YES click */
 yesBtn.addEventListener("click",()=>{
-  try{ stephSound.currentTime=0; stephSound.play(); } catch(e){}
+  try{ 
+    stephSound.currentTime=0; 
+    stephSound.loop = true; // loop the audio
+    stephSound.play(); 
+  } catch(e){}
   explodeHearts(canvas.width/2,canvas.height/2);
 });
 
@@ -166,5 +170,4 @@ function explodeHearts(x,y){
 </script>
 </body>
 </html>
-
 
