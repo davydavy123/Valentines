@@ -6,8 +6,7 @@
 <title>My Goop 💖</title>
 <style>
 html, body {
-  margin:0; padding:0;
-  width:100vw; height:100vh;
+  margin:0; padding:0; width:100vw; height:100vh;
   overflow:hidden;
   font-family:'Comic Sans MS', cursive, sans-serif;
   background: linear-gradient(135deg,#ffd6f0,#e6c9ff,#d9b3ff);
@@ -19,24 +18,22 @@ html, body {
   pointer-events:none;
 }
 .container {
-  text-align:center; z-index:5;
-  display:flex; flex-direction:column; align-items:center;
+  z-index:5; text-align:center;
 }
 h1{font-size:3rem; text-shadow:0 0 25px #ffb6c1;}
 h2{font-size:2rem; text-shadow:0 0 15px #ffb6c1;}
-.buttons-wrapper{
-  display:flex; gap:40px; margin-top:20px;
-  align-items:center; justify-content:center;
-  position:relative;
+.buttons-wrapper {
+  display:flex; gap:40px; justify-content:center; margin-top:20px;
 }
-button{
+button {
   padding:15px 45px; font-size:1.3rem;
   border:none; border-radius:30px; cursor:pointer;
-  transition:0.3s; color:white;
+  color:white; transition:0.3s;
 }
-#yesBtn{background:#ff69b4; box-shadow:0 0 25px #ffc0cb;}
-#noBtn{background:#9333ea; box-shadow:0 0 25px #a05aff; position:relative;}
-.floating{position:absolute; z-index:2; pointer-events:none;}
+#yesBtn { background:#ff69b4; box-shadow:0 0 25px #ffc0cb;}
+#noBtn { background:#9333ea; box-shadow:0 0 25px #a05aff; }
+.floating {position:absolute; z-index:2; pointer-events:none;}
+.pokemon { width:100px;}
 </style>
 </head>
 <body>
@@ -52,6 +49,7 @@ button{
   </div>
 </div>
 
+<!-- Replace with your public MP3 URL if you have one -->
 <audio id="audio" src="YOUR_PUBLIC_MP3_URL_HERE.mp3"></audio>
 
 <canvas id="canvas"></canvas>
@@ -65,45 +63,39 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// NO button movement relative to current position
-let noX = 0, noY = 0;
-function initNoPosition(){
-  const rect = noBtn.getBoundingClientRect();
-  noX = 0; // relative to wrapper
-  noY = 0;
-  noBtn.style.transform = `translate(${noX}px, ${noY}px)`;
-}
-initNoPosition();
+// NO button final position (inline, starts by default)
+let noOffsetX = 0, noOffsetY = 0;
 
-// Mouse-triggered NO movement
-document.addEventListener("mousemove", e=>{
+// Move NO only when mouse is near
+document.addEventListener("mousemove", e => {
   const rect = noBtn.getBoundingClientRect();
   const dx = e.clientX - (rect.left + rect.width/2);
   const dy = e.clientY - (rect.top + rect.height/2);
-  const distance = Math.sqrt(dx*dx + dy*dy);
-  if(distance < 120){
-    noX -= dx*0.1; // speed
-    noY -= dy*0.1;
-    noBtn.style.transform = `translate(${noX}px, ${noY}px) rotate(${Math.sin(Date.now()/100)*15}deg)`;
-  } else {
-    noBtn.style.transform = `translate(${noX}px, ${noY}px) rotate(0deg)`;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  if (dist < 120) {
+    noOffsetX -= dx * 0.1;
+    noOffsetY -= dy * 0.1;
+    noBtn.style.transform = `translate(${noOffsetX}px, ${noOffsetY}px) rotate(${Math.sin(Date.now()/120)*15}deg)`;
   }
 });
 
-// YES button triggers heart fireworks and audio
-yesBtn.addEventListener("click", ()=>{
-  try { audio.currentTime=0; audio.play(); } catch(e){}
-  createHearts(canvas.width/2, canvas.height/2);
+// YES triggers hearts + audio
+yesBtn.addEventListener("click", () => {
+  try { audio.currentTime = 0; audio.play(); } catch(e) {}
+  launchHeartFireworks(canvas.width/2, canvas.height/2);
 });
 
 // Heart fireworks
-function createHearts(x,y){
-  let particles=[];
-  for(let i=0;i<200;i++){
+function launchHeartFireworks(cx, cy) {
+  const particles = [];
+  for (let i=0; i<200; i++) {
     particles.push({
-      x,y, angle:Math.random()*2*Math.PI,
-      speed:Math.random()*4+1.5, size:Math.random()*15+5,
-      color:`hsl(${Math.random()*360},80%,70%)`, life:100
+      x: cx, y: cy,
+      angle: Math.random()*2*Math.PI,
+      speed: Math.random()*4+1.5,
+      size: Math.random()*15+5,
+      color: `hsl(${Math.random()*360},80%,70%)`,
+      life: 100
     });
   }
   function drawHeart(x,y,sz,color){
@@ -118,60 +110,62 @@ function createHearts(x,y){
     ctx.fill();
     ctx.restore();
   }
-  function animate(){
+  function animate() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    particles.forEach((p,i)=>{
+    particles.forEach((p,i) => {
       p.x += Math.cos(p.angle)*p.speed;
       p.y += Math.sin(p.angle)*p.speed;
       p.life--;
       drawHeart(p.x,p.y,p.size,p.color);
-      if(p.life<=0) particles.splice(i,1);
+      if (p.life<=0) particles.splice(i,1);
     });
-    if(particles.length>0) requestAnimationFrame(animate);
+    if (particles.length>0) requestAnimationFrame(animate);
   }
   animate();
 }
 
 // Floating elements
-function createFloating(type, content, width, speedX, speedY){
+function createFloating(type, content, width, speedX, speedY) {
   const el = document.createElement(type);
-  el.className="floating";
-  if(type==="img") el.src = content;
-  else el.innerText = content;
-  if(width) el.style.width=width+"px";
-  el.style.left=Math.random()*(window.innerWidth-100)+"px";
-  el.style.top=Math.random()*(window.innerHeight-100)+"px";
+  el.className = "floating";
+  if (type === "img") el.src = content; else el.innerText = content;
+  if (width) el.style.width = width + "px";
+  el.style.left = Math.random()*(window.innerWidth-100)+"px";
+  el.style.top = Math.random()*(window.innerHeight-100)+"px";
   document.getElementById("background-layer").appendChild(el);
-  function floatAnim(){
-    let x=parseFloat(el.style.left), y=parseFloat(el.style.top);
-    x+=speedX; y+=speedY;
-    if(x<0 || x>window.innerWidth-100) speedX*=-1;
-    if(y<0 || y>window.innerHeight-100) speedY*=-1;
-    el.style.left=x+"px";
-    el.style.top=y+"px";
+
+  function floatAnim() {
+    let x = parseFloat(el.style.left), y = parseFloat(el.style.top);
+    x += speedX; y += speedY;
+    if(x < 0 || x > window.innerWidth-100) speedX *= -1;
+    if(y < 0 || y > window.innerHeight-100) speedY *= -1;
+    el.style.left = x + "px";
+    el.style.top = y + "px";
     requestAnimationFrame(floatAnim);
   }
   floatAnim();
 }
 
 // Flowers
-for(let i=0;i<15;i++)
+for (let i = 0; i < 15; i++)
   createFloating("div","🌸",null,(Math.random()-0.5)*0.3,(Math.random()-0.5)*0.3);
 
 // Confetti
-for(let i=0;i<20;i++)
+for (let i = 0; i < 20; i++)
   createFloating("div","🎀",null,(Math.random()-0.5)*0.3,(Math.random()-0.5)*0.3);
 
-// Pokémon official artwork
-const pokemonUrls=[
+// Official artwork for Pokémon
+const pokeArt = [
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/872.png", // Belibolt
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/939.png", // Snom
-  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1016.png", // Tandemaus
-  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1017.png"  // Maushold
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/924.png", // Tandemaus :contentReference[oaicite:1]{index=1}
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/925.png"  // Maushold :contentReference[oaicite:2]{index=2}
 ];
-pokemonUrls.forEach(u=>createFloating("img",u,90,(Math.random()-0.5)*0.2,(Math.random()-0.5)*0.2));
+
+pokeArt.forEach(url =>
+  createFloating("img", url, 90, (Math.random()-0.5)*0.2,(Math.random()-0.5)*0.2)
+);
 </script>
 </body>
 </html>
-
 
