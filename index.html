@@ -81,6 +81,7 @@ canvas {
     width: 160px;
     animation: float 5s ease-in-out infinite;
     z-index: 3;
+    image-rendering: pixelated; /* keeps sprite crisp */
 }
 
 @keyframes float {
@@ -216,7 +217,8 @@ noBtn.addEventListener("touchstart", moveNoButton);
 /* Bellibolt hover → rainbow sparks */
 bellibolts.forEach(b => {
     b.addEventListener("mouseover", () => {
-        for (let i=0;i<10;i++){
+        const sparkCount = window.innerWidth < 768 ? 6 : 12;
+        for (let i=0;i<sparkCount;i++){
             const spark = document.createElement("div");
             spark.classList.add("bellibolt-spark");
             spark.style.left = (b.offsetLeft + 60 + Math.random()*60) + "px";
@@ -246,7 +248,8 @@ snoms.forEach(s => {
 /* Bellibolt click → rainbow sparks */
 bellibolts.forEach(b => {
     b.addEventListener("click", ()=>{
-        for(let i=0;i<12;i++){
+        const sparkCount = window.innerWidth < 768 ? 6 : 12;
+        for(let i=0;i<sparkCount;i++){
             const spark = document.createElement("div");
             spark.classList.add("bellibolt-spark");
             spark.style.left = (b.offsetLeft + 60 + Math.random()*60) + "px";
@@ -266,7 +269,7 @@ yesBtn.addEventListener("click", () => {
 
 function explodeHearts(x,y){
     let particles=[];
-    const count = window.innerWidth < 768 ? 80 : 150; // fewer on mobile
+    const count = window.innerWidth < 768 ? 80 : 150;
     for(let i=0;i<count;i++){
         particles.push({
             x:x,
@@ -294,7 +297,8 @@ function explodeHearts(x,y){
 
 /* Background floating hearts */
 const heartContainer = document.getElementById("heart-container");
-for(let i=0;i<30;i++){
+const heartCount = window.innerWidth < 768 ? 15 : 30;
+for(let i=0;i<heartCount;i++){
     const heart = document.createElement("div");
     heart.className="background-heart";
     heart.style.left = Math.random()*window.innerWidth + "px";
@@ -318,5 +322,6 @@ for(let i=0;i<50;i++){
 </script>
 </body>
 </html>
+
 
 
