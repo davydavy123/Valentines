@@ -6,16 +6,16 @@
 <title>My Goop 💖</title>
 <style>
 html, body {
-    overflow: hidden;
     margin: 0;
+    padding: 0;
+    overflow: hidden;
     height: 100vh;
-    background: linear-gradient(135deg, #ffd6f0, #e6c9ff, #d9b3ff);
     font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: linear-gradient(135deg, #ffd6f0, #e6c9ff, #d9b3ff);
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
-    position: relative;
 }
 
 #bg-text {
@@ -36,23 +36,31 @@ html, body {
     100% { transform: translate(-50%, -50%) rotate(-10deg); }
 }
 
-.container { text-align:center; z-index:5; }
+.container {
+    text-align: center;
+    z-index: 5;
+    max-width: 90vw;
+}
+
 h1 { font-size:3rem; text-shadow:0 0 25px #ffb6c1; }
 h2 { font-size:2rem; text-shadow:0 0 15px #ffb6c1; }
 
-.buttons { margin-top:30px; position:relative; }
+.buttons {
+    margin-top: 30px;
+}
+
 button {
-    padding:15px 45px;
+    padding: 15px 45px;
     font-size:1.3rem;
     border:none;
     border-radius:30px;
     cursor:pointer;
     margin:10px;
     transition:0.3s;
-    position: fixed;
 }
-#yesBtn { background-color:#ff69b4; box-shadow:0 0 25px #ffc0cb; animation: pulse 2s infinite; top: 50%; left: 40%; transform: translate(-50%, -50%); }
-#noBtn { background-color:#9333ea; top: 50%; left: 60%; transform: translate(-50%, -50%); }
+
+#yesBtn { background-color:#ff69b4; box-shadow:0 0 25px #ffc0cb; animation: pulse 2s infinite; }
+#noBtn { background-color:#9333ea; }
 
 @keyframes pulse {
     0% { transform: scale(1); box-shadow:0 0 20px #ffb6c1; }
@@ -79,7 +87,7 @@ button {
 .poke-heart { position:absolute; font-size:15px; animation: floatPokeHeart 2s infinite; pointer-events:none; }
 @keyframes floatPokeHeart { 0% {transform:translate(0,0) scale(0.8); opacity:1;} 50% {transform:translate(5px,-10px) scale(1.2); opacity:0.8;} 100% {transform:translate(0,0) scale(1); opacity:1;} }
 
-.background-heart, .confetti, .flower { position:absolute; pointer-events:none; }
+canvas { position: fixed; top:0; left:0; z-index:2; pointer-events:none; }
 
 @media (max-width:768px){
     h1{font-size:2rem;} h2{font-size:1.5rem;}
@@ -112,11 +120,12 @@ const yesBtn=document.getElementById("yesBtn");
 const noBtn=document.getElementById("noBtn");
 const stephSound=document.getElementById("stephSound");
 
-/* Helper to place elements inside viewport */
+/* Helper to place elements fully inside viewport */
 function placeInsideViewport(el,padding=20){
-    const w=el.offsetWidth, h=el.offsetHeight;
-    el.style.left=Math.random()*(window.innerWidth-w-padding)+"px";
-    el.style.top=Math.random()*(window.innerHeight-h-padding)+"px";
+    const w = el.offsetWidth || 50;
+    const h = el.offsetHeight || 50;
+    el.style.left = Math.random()*(window.innerWidth - w - padding)+"px";
+    el.style.top = Math.random()*(window.innerHeight - h - padding)+"px";
 }
 
 /* Pokémon */
@@ -137,6 +146,7 @@ pokeSrcs.forEach(src=>{
     img.src=src; img.className="pokemon";
     img.onload=()=>placeInsideViewport(img);
     document.body.appendChild(img);
+
     setInterval(()=>{
         const h=document.createElement("div"); h.className="poke-heart"; h.innerText="💖";
         const rect=img.getBoundingClientRect();
@@ -149,7 +159,7 @@ pokeSrcs.forEach(src=>{
 
 /* NO button chase */
 let mouseX=0, mouseY=0;
-let noX=window.innerWidth/2, noY=window.innerHeight/2;
+let noX=noBtn.offsetLeft, noY=noBtn.offsetTop;
 document.addEventListener("mousemove", e=>{ mouseX=e.clientX; mouseY=e.clientY; });
 
 function chaseNoButton(){
@@ -198,3 +208,4 @@ function explodeHearts(x,y){
 </script>
 </body>
 </html>
+
