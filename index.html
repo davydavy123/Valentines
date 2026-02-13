@@ -66,7 +66,7 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// NO button moves only when mouse is close
+// NO button only moves when mouse is close
 let noX = window.innerWidth/2 - 50;
 let noY = window.innerHeight/2 + 50;
 noBtn.style.left = noX+"px";
@@ -78,13 +78,11 @@ document.addEventListener("mousemove", e=>{
   const dx = mx - (noX + noBtn.offsetWidth/2);
   const dy = my - (noY + noBtn.offsetHeight/2);
   const distance = Math.sqrt(dx*dx + dy*dy);
-  const radius = 100; // distance to start moving
+  const radius = 120; // trigger distance
   if(distance < radius){
-    // move away
     const angle = Math.atan2(dy, dx);
-    noX -= Math.cos(angle)*8;
-    noY -= Math.sin(angle)*8;
-    // keep inside screen
+    noX -= Math.cos(angle)*6;
+    noY -= Math.sin(angle)*6;
     noX = Math.max(0, Math.min(window.innerWidth - noBtn.offsetWidth, noX));
     noY = Math.max(0, Math.min(window.innerHeight - noBtn.offsetHeight, noY));
     noBtn.style.left = noX + "px";
@@ -117,7 +115,7 @@ function explodeHearts(x,y){
   animate();
 }
 
-// Floating background flowers/petals/confetti
+// Floating background elements
 function createFloating(element,text,color,size){
   element.innerText = text;
   element.style.fontSize = size+"px";
@@ -141,28 +139,45 @@ function createFloating(element,text,color,size){
   float();
 }
 
-// Add flowers
+// Flowers
 for(let i=0;i<15;i++){
   const f=document.createElement("div");
   createFloating(f,"🌸","#ffb6c1",20+Math.random()*20);
 }
 
-// Add confetti
+// Confetti
 for(let i=0;i<20;i++){
   const c=document.createElement("div");
   createFloating(c,"🎀","#ffc0cb",15+Math.random()*10);
 }
 
-// Add Pokémon
+// Pokémon
 const pokeSrcs=[
-  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png",
-  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png"
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png", // Belibolt
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png", // Snom
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1016.png", // Tandemaus
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1017.png"  // Maushold (Mousehauld)
 ];
 pokeSrcs.forEach(src=>{
   const img=document.createElement("img"); img.src=src; img.className="pokemon";
+  img.style.width="100px";
   img.style.left = Math.random()*window.innerWidth+"px";
   img.style.top = Math.random()*window.innerHeight+"px";
   document.body.appendChild(img);
+
+  let dx = (Math.random()-0.5)*1;
+  let dy = (Math.random()-0.5)*1;
+  function float(){
+    let x = parseFloat(img.style.left);
+    let y = parseFloat(img.style.top);
+    x += dx; y += dy;
+    if(x<0 || x>window.innerWidth) dx*=-1;
+    if(y<0 || y>window.innerHeight) dy*=-1;
+    img.style.left = x+"px";
+    img.style.top = y+"px";
+    requestAnimationFrame(float);
+  }
+  float();
 });
 
 </script>
