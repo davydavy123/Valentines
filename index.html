@@ -16,6 +16,7 @@ body {
     justify-content: center;
     align-items: center;
     color: white;
+    position: relative;
 }
 
 #glow-overlay {
@@ -23,30 +24,37 @@ body {
     top: 0; left: 0;
     width: 100%; height: 100%;
     pointer-events: none;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 192, 203, 0.25), transparent 70%), 
-                radial-gradient(circle at 70% 70%, rgba(200, 180, 255, 0.2), transparent 60%);
+    background: radial-gradient(circle at 30% 30%, rgba(255,192,203,0.25), transparent 70%), 
+                radial-gradient(circle at 70% 70%, rgba(200,180,255,0.2), transparent 60%);
     z-index: 0;
 }
 
-.container {
+/* Floating, sparkling background text */
+#bg-text {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-10deg);
+    font-size: 6rem;
+    color: rgba(255,182,193,0.2);
+    white-space: nowrap;
+    z-index: 0;
+    pointer-events: none;
     text-align: center;
-    z-index: 5;
+    animation: floatText 8s ease-in-out infinite alternate;
 }
 
-h1 {
-    font-size: 3rem;
-    text-shadow: 0 0 25px #ffb6c1;
+@keyframes floatText {
+    0% { transform: translate(-50%, -52%) rotate(-10deg); }
+    50% { transform: translate(-50%, -48%) rotate(-8deg); }
+    100% { transform: translate(-50%, -50%) rotate(-10deg); }
 }
 
-h2 {
-    font-size: 2rem;
-    text-shadow: 0 0 15px #ffb6c1;
-}
+.container { text-align: center; z-index: 5; }
+h1 { font-size: 3rem; text-shadow: 0 0 25px #ffb6c1; }
+h2 { font-size: 2rem; text-shadow: 0 0 15px #ffb6c1; }
 
-.buttons {
-    margin-top: 30px;
-    position: relative;
-}
+.buttons { margin-top: 30px; position: relative; }
 
 button {
     padding: 15px 45px;
@@ -58,16 +66,8 @@ button {
     transition: 0.3s;
 }
 
-#yesBtn {
-    background-color: #ff69b4;
-    box-shadow: 0 0 25px #ffc0cb;
-    animation: pulse 2s infinite;
-}
-
-#noBtn {
-    background-color: #9333ea;
-    position: absolute;
-}
+#yesBtn { background-color: #ff69b4; box-shadow: 0 0 25px #ffc0cb; animation: pulse 2s infinite; }
+#noBtn { background-color: #9333ea; position: absolute; }
 
 @keyframes pulse {
     0% { transform: scale(1); box-shadow: 0 0 20px #ffb6c1; }
@@ -75,89 +75,48 @@ button {
     100% { transform: scale(1); box-shadow: 0 0 20px #ffb6c1; }
 }
 
-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    z-index: 1;
-}
-
+/* Pokémon styling */
 .pokemon {
     position: absolute;
-    width: 160px;
+    width: 120px;
     animation: float 5s ease-in-out infinite;
     z-index: 3;
     image-rendering: pixelated;
     filter: drop-shadow(0 0 15px rgba(255,192,203,0.7));
 }
 
-@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-25px); }
-    100% { transform: translateY(0px); }
-}
+@keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-25px); } 100% { transform: translateY(0px); } }
 
 .bellibolt-spark {
-    position: absolute;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    pointer-events: none;
+    position: absolute; width: 15px; height: 15px; border-radius: 50%; pointer-events: none;
     animation: sparkAnim 0.6s forwards;
 }
 
-@keyframes sparkAnim {
-    0% { opacity: 1; transform: scale(1); }
-    100% { opacity: 0; transform: scale(3); }
-}
+@keyframes sparkAnim { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:scale(3); } }
 
 .heart-particle {
-    position: absolute;
-    font-size: 20px;
-    animation: heartMove 1s forwards;
+    position: absolute; font-size: 20px; animation: heartMove 1s forwards;
 }
 
 @keyframes heartMove {
-    0% { opacity: 1; transform: translate(0,0) scale(1); }
-    100% { opacity: 0; transform: translate(calc(50px - 100px*var(--randX)), -80px) scale(1.5); }
+    0% { opacity:1; transform: translate(0,0) scale(1); }
+    100% { opacity:0; transform: translate(calc(50px - 100px*var(--randX)),-80px) scale(1.5); }
 }
 
 .background-heart {
-    position: absolute;
-    font-size: 25px;
-    animation: drift linear infinite;
-    opacity: 0.7;
-    filter: drop-shadow(0 0 8px rgba(255, 182, 193,0.7));
+    position: absolute; font-size:25px; animation: drift linear infinite;
+    opacity:0.7; filter: drop-shadow(0 0 8px rgba(255,182,193,0.7));
 }
 
-.flower {
-    position: absolute;
-    width: 30px;
-    opacity: 0.7;
-    animation: floatFlower linear infinite;
-    pointer-events: none;
-}
+.flower { position:absolute; width:30px; opacity:0.7; animation: floatFlower linear infinite; pointer-events:none; }
 
-.background-twinkle {
-    position: absolute;
-    width: 5px;
-    height: 5px;
-    background: rgba(255,255,255,0.8);
-    border-radius: 50%;
-    animation: sparkle 4s linear infinite;
-}
+.background-twinkle { position:absolute; width:5px; height:5px; background: rgba(255,255,255,0.8); border-radius:50%; animation: sparkle 4s linear infinite; }
 
-@keyframes drift { 0% { transform: translateY(0) rotate(0deg);} 100% { transform: translateY(-1200px) rotate(360deg); }}
-@keyframes floatFlower { 0% { transform: translateY(0) rotate(0deg); opacity:0.7;} 50% { transform: translateY(-100px) rotate(180deg); opacity:1;} 100% { transform: translateY(0px) rotate(360deg); opacity:0.7;}}
+@keyframes drift { 0% { transform: translateY(0) rotate(0deg);} 100% { transform: translateY(-1200px) rotate(360deg);} }
+@keyframes floatFlower { 0% { transform: translateY(0) rotate(0deg); opacity:0.7;} 50% { transform: translateY(-100px) rotate(180deg); opacity:1;} 100% { transform: translateY(0px) rotate(360deg); opacity:0.7;} }
 @keyframes sparkle { 0% { transform: translate(0,0) scale(1); opacity:0.5; } 50% { transform: translate(20px,-40px) scale(1.3); opacity:1; } 100% { transform: translate(0,0) scale(1); opacity:0.5; } }
 
-@media (max-width: 768px) {
-    h1 { font-size: 2rem; }
-    h2 { font-size: 1.5rem; }
-    .pokemon { width: 100px; }
-    button { padding: 12px 30px; font-size: 1rem; }
-}
+@media (max-width:768px){ h1{font-size:2rem;} h2{font-size:1.5rem;} .pokemon{width:80px;} button{padding:12px 30px; font-size:1rem;} #bg-text{font-size:3rem;} }
 </style>
 </head>
 <body>
@@ -166,15 +125,20 @@ canvas {
 <div id="flower-container"></div>
 <div id="heart-container"></div>
 <div id="twinkle-container"></div>
+<div id="bg-text">Stephanie Poetri ❤️ Love You 3000</div>
 
-<img class="pokemon snom-glow snom" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png" style="top:5%; left:5%; animation-delay:0s;">
-<img class="pokemon snom-glow snom" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png" style="top:20%; right:10%; animation-delay:1s;">
-<img class="pokemon snom-glow snom" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png" style="bottom:10%; left:15%; animation-delay:2s;">
+<!-- Pokémon -->
+<img class="pokemon snom" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png" style="top:5%; left:5%; animation-delay:0s;">
+<img class="pokemon snom" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/872.png" style="top:20%; right:10%; animation-delay:1s;">
 
-<img id="bellibolt1" class="pokemon bellibolt" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png" style="top:10%; left:40%; animation-delay:0.5s;">
-<img id="bellibolt2" class="pokemon bellibolt" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png" style="top:30%; right:35%; animation-delay:1s;">
-<img id="bellibolt3" class="pokemon bellibolt" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png" style="bottom:15%; left:50%; animation-delay:2s;">
-<img id="bellibolt4" class="pokemon bellibolt" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png" style="bottom:10%; right:40%; animation-delay:3s;">
+<img id="bellibolt1" class="pokemon bellibolt" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png" style="top:10%; left:20%; animation-delay:0.5s;">
+<img id="bellibolt2" class="pokemon bellibolt" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png" style="top:10%; left:60%; animation-delay:1s;">
+<img id="bellibolt3" class="pokemon bellibolt" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png" style="bottom:15%; left:25%; animation-delay:2s;">
+<img id="bellibolt4" class="pokemon bellibolt" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/939.png" style="bottom:15%; left:65%; animation-delay:3s;">
+
+<img class="pokemon eevee" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png" style="top:40%; left:10%; animation-delay:0.3s;">
+<img class="pokemon togepi" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/175.png" style="bottom:20%; right:15%; animation-delay:0.7s;">
+<img class="pokemon jigglypuff" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png" style="top:30%; right:30%; animation-delay:1s;">
 
 <div class="container">
     <h2>My Goop 💜</h2>
@@ -189,33 +153,31 @@ canvas {
 <audio id="victorySound" src="https://www.myinstants.com/media/sounds/pokemon-level-up-sound-effect.mp3"></audio>
 
 <script>
-const noBtn = document.getElementById("noBtn");
-const yesBtn = document.getElementById("yesBtn");
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const snoms = document.querySelectorAll(".snom");
-const bellibolts = document.querySelectorAll(".bellibolt");
-const victorySound = document.getElementById("victorySound");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+const noBtn=document.getElementById("noBtn");
+const yesBtn=document.getElementById("yesBtn");
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+const snoms=document.querySelectorAll(".snom");
+const bellibolts=document.querySelectorAll(".bellibolt");
+const victorySound=document.getElementById("victorySound");
 
-/* NO button chases cursor + random jumps */
+/* NO button chasing */
 let mouseX=0, mouseY=0;
 let noX=window.innerWidth/2, noY=window.innerHeight/2;
 const speed=6;
-document.addEventListener("mousemove", e => { mouseX=e.clientX; mouseY=e.clientY; });
-
-function chaseNoButton() {
-    const dx = noX - mouseX;
-    const dy = noY - mouseY;
-    const dist = Math.sqrt(dx*dx + dy*dy);
-    if(dist < 150) {
-        noX += (dx/dist)*speed;
-        noY += (dy/dist)*speed;
-        noX = Math.max(0, Math.min(window.innerWidth - noBtn.offsetWidth, noX));
-        noY = Math.max(0, Math.min(window.innerHeight - noBtn.offsetHeight, noY));
-        noBtn.style.left=noX+"px";
-        noBtn.style.top=noY+"px";
+document.addEventListener("mousemove", e=>{mouseX=e.clientX; mouseY=e.clientY;});
+function chaseNoButton(){
+    const dx=noX-mouseX, dy=noY-mouseY;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<150){
+        noX+=(dx/dist)*speed; noY+=(dy/dist)*speed;
+        const maxX=window.innerWidth-noBtn.offsetWidth-10;
+        const maxY=window.innerHeight-noBtn.offsetHeight-10;
+        noX=Math.max(10, Math.min(maxX,noX));
+        noY=Math.max(10, Math.min(maxY,noY));
+        noBtn.style.left=noX+"px"; noBtn.style.top=noY+"px";
         noBtn.style.transform=`rotate(${Math.random()*60-30}deg)`;
     }
     requestAnimationFrame(chaseNoButton);
@@ -226,7 +188,7 @@ setInterval(()=>{ if(Math.random()<0.1){ noX=Math.random()*(window.innerWidth-no
 /* Bellibolt sparks */
 bellibolts.forEach(b=>{
     b.addEventListener("mouseover", ()=>{
-        const sparkCount = window.innerWidth < 768 ? 6 : 12;
+        const sparkCount=window.innerWidth<768?6:12;
         for(let i=0;i<sparkCount;i++){
             const spark=document.createElement("div");
             spark.classList.add("bellibolt-spark");
@@ -245,27 +207,10 @@ snoms.forEach(s=>{
         for(let i=0;i<6;i++){
             const heart=document.createElement("div");
             heart.className="heart-particle";
-            heart.style.left=e.pageX+"px";
-            heart.style.top=e.pageY+"px";
+            heart.style.left=e.pageX+"px"; heart.style.top=e.pageY+"px";
             heart.style.setProperty('--randX', Math.random());
             document.body.appendChild(heart);
             setTimeout(()=>heart.remove(),1000);
-        }
-    });
-});
-
-/* Bellibolt click sparks */
-bellibolts.forEach(b=>{
-    b.addEventListener("click", ()=>{
-        const sparkCount = window.innerWidth < 768 ? 6 : 12;
-        for(let i=0;i<sparkCount;i++){
-            const spark=document.createElement("div");
-            spark.classList.add("bellibolt-spark");
-            spark.style.left=(b.offsetLeft+60+Math.random()*60)+"px";
-            spark.style.top=(b.offsetTop+60+Math.random()*60)+"px";
-            spark.style.backgroundColor=`hsl(${Math.random()*360},100%,70%)`;
-            document.body.appendChild(spark);
-            setTimeout(()=>spark.remove(),600);
         }
     });
 });
@@ -276,10 +221,9 @@ yesBtn.addEventListener("click", ()=>{
     explodeHearts(canvas.width/2,canvas.height/2);
 });
 
-/* Heart explosion */
 function explodeHearts(x,y){
     let particles=[];
-    const count = window.innerWidth < 768 ? 80 : 150;
+    const count=window.innerWidth<768?80:150;
     for(let i=0;i<count;i++){
         particles.push({x:x,y:y,angle:Math.random()*2*Math.PI,speed:Math.random()*6+2,size:25,life:100});
     }
