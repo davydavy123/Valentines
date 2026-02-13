@@ -123,30 +123,22 @@ for(let i=0;i<100;i++){
   setInterval(()=>{ let top=parseFloat(c.style.top); top+=dy; if(top>window.innerHeight) top=0; c.style.top=top+"px"; },50);
 }
 
-/* NO button super fast teleporting */
-let noX=Math.random()*(window.innerWidth-100);
-let noY=Math.random()*(window.innerHeight-50);
-noBtn.style.left=noX+"px"; noBtn.style.top=noY+"px";
-
-function moveNo(){
-  noX+=Math.random()*12-6; // increase speed
-  noY+=Math.random()*12-6;
-  if(noX<0||noX>window.innerWidth-noBtn.offsetWidth||noY<0||noY>window.innerHeight-noBtn.offsetHeight){
-    // teleport instead of bouncing
-    noX=Math.random()*(window.innerWidth-noBtn.offsetWidth-10);
-    noY=Math.random()*(window.innerHeight-noBtn.offsetHeight-10);
-  }
-  noBtn.style.left=noX+"px";
-  noBtn.style.top=noY+"px";
-  requestAnimationFrame(moveNo);
+/* NO button jumpy & playful */
+function jumpNo() {
+    let newX = Math.random()*(window.innerWidth-noBtn.offsetWidth-10);
+    let newY = Math.random()*(window.innerHeight-noBtn.offsetHeight-10);
+    noBtn.style.left = newX + "px";
+    noBtn.style.top = newY + "px";
+    noBtn.style.transform = `rotate(${Math.random()*30-15}deg)`; // wiggle rotation
 }
-moveNo();
+// Jump every 50ms
+setInterval(jumpNo,50);
 
 /* YES click */
 yesBtn.addEventListener("click",()=>{
   try{ 
     stephSound.currentTime=0; 
-    stephSound.loop = true; // loop the audio
+    stephSound.loop = true; 
     stephSound.play(); 
   } catch(e){}
   explodeHearts(canvas.width/2,canvas.height/2);
@@ -170,4 +162,5 @@ function explodeHearts(x,y){
 </script>
 </body>
 </html>
+
 
